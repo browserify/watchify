@@ -1,7 +1,6 @@
 var fs = require('fs');
-var browserify = require('browserify');
-var mdeps = require('module-deps');
 var through = require('through');
+var browserify = require('browserify');
 
 module.exports = function (opts, cb) {
     if (!opts) opts = {};
@@ -10,7 +9,7 @@ module.exports = function (opts, cb) {
     var pending = false;
     
     b.on('dep', function (dep) {
-        cache[dep.id] = dep;
+        cache[dep.id] = dep.source;
         
         fs.watch(dep.id, function (type) {
             delete cache[dep.id];
@@ -22,8 +21,6 @@ module.exports = function (opts, cb) {
             }, opts.delay || 300);
             
             pending = true;
-            
-            console.log(Date.now());
         });
     });
     

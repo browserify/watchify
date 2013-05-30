@@ -1,14 +1,14 @@
 {
     "name": "watchify",
-    "version": "0.0.0",
+    "version": "0.0.1",
     "description": "watch mode for browserify builds",
     "main": "index.js",
     "bin": "bin/cmd.js",
     "dependencies": {
-        "browserify": ">=2.17.0 <3.0.0",
+        "browserify": ">=2.17.2 <3.0.0",
         "optimist": "~0.5.0",
         "through": "~2.2.1",
-        "module-deps": "~0.9.0"
+        "module-deps": "~0.10.0"
     },
     "devDependencies": {
         "tap": "~0.4.0"

@@ -6,13 +6,17 @@ module.exports = function (opts) {
     if (!opts) opts = {};
     var b = typeof opts.bundle === 'function' ? opts : browserify(opts);
     var cache = {};
+    var watching = {};
     var pending = false;
     
     b.on('dep', function (dep) {
-        cache[dep.id] = dep.source;
+        if (watching[dep.id]) return;
+        watching[dep.id] = true;
+        cache[dep.id] = dep;
         
         fs.watch(dep.id, function (type) {
             delete cache[dep.id];
+            watching[dep.id] = false;
             
             // wait for the disk/editor to quiet down first:
             if (!pending) setTimeout(function () {
@@ -25,13 +29,18 @@ module.exports = function (opts) {
     });
     
     var bundle = b.bundle.bind(b);
+    var first = true;
     b.bundle = function (opts_, cb) {
+        if (b._pending) return bundle(opts_, cb);
+        
         if (typeof opts_ === 'function') {
             cb = opts_;
             opts_ = {};
         }
         if (!opts_) opts_ = {};
-        opts_.cache = cache;
+        if (!first) opts_.cache = cache;
+        first = false;
+        
         return bundle(opts_, cb);
     };
     

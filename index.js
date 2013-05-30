@@ -2,7 +2,7 @@ var fs = require('fs');
 var through = require('through');
 var browserify = require('browserify');
 
-module.exports = function (opts, cb) {
+module.exports = function (opts) {
     if (!opts) opts = {};
     var b = typeof opts.bundle === 'function' ? opts : browserify(opts);
     var cache = {};

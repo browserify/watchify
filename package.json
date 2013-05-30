@@ -1,0 +1,37 @@
+{
+    "name": "watchify",
+    "version": "0.0.0",
+    "description": "watch mode for browserify builds",
+    "main": "index.js",
+    "bin": "bin/cmd.js",
+    "dependencies": {
+        "browserify": ">=2.17.0 <3.0.0",
+        "optimist": "~0.5.0",
+        "through": "~2.2.1",
+        "module-deps": "~0.9.0"
+    },
+    "devDependencies": {
+        "tap": "~0.4.0"
+    },
+    "scripts": {
+        "test": "tap test/*.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/substack/watchify.git"
+    },
+    "homepage": "https://github.com/substack/watchify",
+    "keywords": [
+        "browserify",
+        "watch",
+        "bundle",
+        "build",
+        "browser"
+    ],
+    "author": {
+        "name": "James Halliday",
+        "email": "mail@substack.net",
+        "url": "http://substack.net"
+    },
+    "license": "MIT"
+}

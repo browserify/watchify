@@ -7,7 +7,7 @@ module.exports = function (opts) {
     var b = typeof opts.bundle === 'function' ? opts : browserify(opts);
     var cache = {};
     var watching = {};
-    var pending = false;
+    var lastUpdate = 0;
     
     b.on('dep', function (dep) {
         if (watching[dep.id]) return;
@@ -17,14 +17,12 @@ module.exports = function (opts) {
         fs.watch(dep.id, function (type) {
             delete cache[dep.id];
             watching[dep.id] = false;
-            
-            // wait for the disk/editor to quiet down first:
-            if (!pending) setTimeout(function () {
-                pending = false;
+
+            var now = Date.now();
+            if (now - lastUpdate > 2000) {
                 b.emit('update');
-            }, opts.delay || 300);
-            
-            pending = true;
+                lastUpdate = now;
+            }
         });
     });
     

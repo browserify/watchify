@@ -6,8 +6,13 @@ module.exports = function (opts) {
     if (!opts) opts = {};
     var b = typeof opts.bundle === 'function' ? opts : browserify(opts);
     var cache = {};
+    var pkgcache = {};
     var watching = {};
     var pending = false;
+    
+    b.on('package', function (file, pkg) {
+        pkgcache[file] = pkg;
+    });
     
     b.on('dep', function (dep) {
         if (watching[dep.id]) return;
@@ -39,6 +44,8 @@ module.exports = function (opts) {
         }
         if (!opts_) opts_ = {};
         if (!first) opts_.cache = cache;
+        opts_.includePackage = true;
+        opts_.packageCache = pkgcache;
         first = false;
         
         return bundle(opts_, cb);

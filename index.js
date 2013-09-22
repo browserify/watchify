@@ -12,12 +12,18 @@ function watchify(opts) {
     var pkgcache = {};
     var watching = {};
     var pending = false;
+    var queuedCloses = {};
+    var queuedDeps = {};
 
     b.on('package', function (file, pkg) {
         pkgcache[file] = pkg;
     });
 
-    b.on('dep', function (dep) {
+    b.on('dep', function(dep) {
+        queuedDeps[dep.id] = dep;
+    });
+
+    function addDep (dep) {
         if (watching[dep.id]) return;
         watching[dep.id] = true;
         cache[dep.id] = dep;
@@ -31,8 +37,7 @@ function watchify(opts) {
         });
         watcher.on('change', function(path) {
             delete cache[dep.id];
-            watching[dep.id] = false;
-            watcher.close();
+            queuedCloses[dep.id] = watcher;
 
             // wait for the disk/editor to quiet down first:
             if (!pending) setTimeout(function () {
@@ -42,7 +47,8 @@ function watchify(opts) {
 
             pending = true;
         });
-    });
+    }
+
 
     var bundle = b.bundle.bind(b);
     var first = true;
@@ -59,8 +65,24 @@ function watchify(opts) {
         opts_.packageCache = pkgcache;
         first = false;
 
-        return bundle(opts_, cb);
+        // we only want to mess with the listeners if the bundle was created
+        // successfully, e.g. on the 'end' event.
+        var outStream = bundle(opts_, cb);
+        outStream.on('end', function() {
+            var depId;
+            for (depId in queuedCloses) {
+                queuedCloses[depId].close();
+                watching[depId] = false;
+            }
+            queuedCloses = {};
+            for (depId in queuedDeps) {
+                addDep(queuedDeps[depId]);
+            }
+            queuedDeps = {};
+        });
+        return outStream;
     };
 
     return b;
+
 }

@@ -1,6 +1,6 @@
-var fs = require('fs');
 var through = require('through');
 var browserify = require('browserify');
+var chokidar = require('chokidar');
 
 module.exports = watchify;
 watchify.browserify = browserify;
@@ -22,9 +22,17 @@ function watchify(opts) {
         watching[dep.id] = true;
         cache[dep.id] = dep;
 
-        fs.watch(dep.id, function (type) {
+        var watcher = chokidar.watch(dep.id, {
+            persistent: true,
+            ignoreInitial: true,
+        });
+        watcher.on('error', function(err) {
+            b.emit('error', err);
+        });
+        watcher.on('change', function(path) {
             delete cache[dep.id];
             watching[dep.id] = false;
+            watcher.close();
 
             // wait for the disk/editor to quiet down first:
             if (!pending) setTimeout(function () {

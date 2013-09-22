@@ -2,7 +2,10 @@ var fs = require('fs');
 var through = require('through');
 var browserify = require('browserify');
 
-module.exports = function (opts) {
+module.exports = watchify;
+watchify.browserify = browserify;
+
+function watchify(opts) {
     if (!opts) opts = {};
     var b = typeof opts.bundle === 'function' ? opts : browserify(opts);
     var cache = {};
@@ -52,4 +55,4 @@ module.exports = function (opts) {
     };
     
     return b;
-};
+}

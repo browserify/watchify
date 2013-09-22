@@ -66,9 +66,9 @@ function watchify(opts) {
         first = false;
 
         // we only want to mess with the listeners if the bundle was created
-        // successfully, e.g. on the 'end' event.
+        // successfully, e.g. on the 'close' event.
         var outStream = bundle(opts_, cb);
-        outStream.on('end', function() {
+        outStream.on('close', function() {
             var depId;
             for (depId in queuedCloses) {
                 queuedCloses[depId].close();

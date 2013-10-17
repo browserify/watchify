@@ -14,6 +14,18 @@ function watchify(opts) {
     var pending = false;
     var queuedCloses = {};
     var queuedDeps = {};
+    var first = true;
+
+    if (opts.cache) {
+        cache = opts.cache;
+        delete opts.cache;
+        first = false;
+    }
+
+    if (opts.pkgcache) {
+        pkgcache = opts.pkgcache;
+        delete opts.pkgcache;
+    }
 
     b.on('package', function (file, pkg) {
         pkgcache[file] = pkg;
@@ -51,7 +63,6 @@ function watchify(opts) {
 
 
     var bundle = b.bundle.bind(b);
-    var first = true;
     b.bundle = function (opts_, cb) {
         if (b._pending) return bundle(opts_, cb);
 

@@ -14,20 +14,33 @@ function watchify(opts) {
     var pending = false;
     var queuedCloses = {};
     var queuedDeps = {};
+<<<<<<< HEAD
     var changingDeps = {};
     var first = true;
     
+=======
+    var first = true;
+
+>>>>>>> accept cache and pkgcache as options
     if (opts.cache) {
         cache = opts.cache;
         delete opts.cache;
         first = false;
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> accept cache and pkgcache as options
     if (opts.pkgcache) {
         pkgcache = opts.pkgcache;
         delete opts.pkgcache;
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> accept cache and pkgcache as options
     b.on('package', function (file, pkg) {
         pkgcache[file] = pkg;
     });

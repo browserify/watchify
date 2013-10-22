@@ -48,6 +48,12 @@ emits an `'update'` event when a file changes. You should call `w.bundle()`
 after the `'update'` event fires to generate a new bundle. Calling `w.bundle()`
 extra times past the first time will be much faster due to caching.
 
+# events
+
+## w.on('update', function (ids) {})
+
+When the bundle changes, emit the array of bundle `ids` that changed.
+
 # install
 
 With [npm](https://npmjs.org) do:

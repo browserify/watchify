@@ -14,6 +14,7 @@ function watchify(opts) {
     var pending = false;
     var queuedCloses = {};
     var queuedDeps = {};
+    var changingDeps = {};
 
     b.on('package', function (file, pkg) {
         pkgcache[file] = pkg;
@@ -38,11 +39,13 @@ function watchify(opts) {
         watcher.on('change', function(path) {
             delete cache[dep.id];
             queuedCloses[dep.id] = watcher;
+            changingDeps[dep.id] = true
 
             // wait for the disk/editor to quiet down first:
             if (!pending) setTimeout(function () {
                 pending = false;
-                b.emit('update');
+                b.emit('update', Object.keys(changingDeps));
+                changingDeps = {};
             }, opts.delay || 300);
 
             pending = true;

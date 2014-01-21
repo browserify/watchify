@@ -1,11 +1,11 @@
 var through = require('through');
 var browserify = require('browserify');
-var chokidar = require('chokidar');
+var fs = require('fs');
 
 module.exports = watchify;
 watchify.browserify = browserify;
 
-function watchify(opts) {
+function watchify (opts) {
     if (!opts) opts = {};
     var b = typeof opts.bundle === 'function' ? opts : browserify(opts);
     var cache = {};
@@ -41,10 +41,7 @@ function watchify(opts) {
         watching[dep.id] = true;
         cache[dep.id] = dep;
         
-        var watcher = chokidar.watch(dep.id, {
-            persistent: true,
-            ignoreInitial: true,
-        });
+        var watcher = fs.watch(dep.id);
         watcher.on('error', function(err) {
             b.emit('error', err);
         });

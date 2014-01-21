@@ -7,8 +7,7 @@ var path = require('path');
 var fromArgs = require('browserify/bin/args');
 
 var w, outfile, verbose, dotfile;
-var errored = false, first = true;
-var prevErr;
+var prevErr, first = true;
 
 (function retry () {
     w = watchify(fromArgs(process.argv.slice(2)));
@@ -36,7 +35,6 @@ function bundle () {
     var wb = w.bundle();
     var caught = false;
     wb.on('error', function (err) {
-        errored = true;
         console.error(String(err));
     });
     wb.pipe(fs.createWriteStream(dotfile));
@@ -47,10 +45,6 @@ function bundle () {
     
     function end () {
         prevErr = undefined;
-        if (errored && !first) {
-            errored = false;
-            return;
-        }
         first = false;
         fs.rename(dotfile, outfile, function (err) {
             if (err) return console.error(err);

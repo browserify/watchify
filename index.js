@@ -32,7 +32,9 @@ function watchify (opts) {
         pkgcache[file] = pkg;
     });
     
-    b.on('dep', function(dep) {
+    var lastDep;
+    b.on('dep', function (dep) {
+        lastDep = dep;
         queuedDeps[dep.id] = dep;
     });
     
@@ -42,7 +44,7 @@ function watchify (opts) {
         cache[dep.id] = dep;
         
         var watcher = fs.watch(dep.id);
-        watcher.on('error', function(err) {
+        watcher.on('error', function (err) {
             b.emit('error', err);
         });
         watcher.on('change', function(path) {
@@ -62,9 +64,6 @@ function watchify (opts) {
     }
     
     var bundle = b.bundle.bind(b);
-    var firstFiles = [];
-    b.on('file', function (file) { firstFiles.push(file) });
-    
     b.bundle = function (opts_, cb) {
         if (b._pending) return bundle(opts_, cb);
         
@@ -80,27 +79,22 @@ function watchify (opts) {
         // we only want to mess with the listeners if the bundle was created
         // successfully, e.g. on the 'close' event.
         var outStream = bundle(opts_, cb);
-        outStream.on('error', function () {
-            var watches = firstFiles.map(function (file) {
-                var w = fs.watch(file);
-                w.on('error', function () {});
-                w.on('change', function () {
-                    setTimeout(
-                        function () { onchange(file) },
-                        opts.delay || 300
-                    );
-                });
-                return w;
-            });
-            var changed = false;
-            function onchange (file) {
-                if (changed) return;
-                changed = true;
-                watches.forEach(function (w) { w.close() });
-                b.emit('update', file);
+        outStream.on('error', function (err) {
+            if (err.type === 'not found') {
+                var updated = false;
+                b.once('update', function () { updated = true });
+                (function f () {
+                    if (updated) return;
+                    fs.exists(err.filename, function (ex) {
+                        if (ex) b.emit('update', [ err.filename ])
+                        else setTimeout(f, opts.delay || 300)
+                    });
+                })();
             }
+            else close()
         });
-        outStream.on('close', function() {
+        outStream.on('close', close);
+        function close () {
             first = false;
             var depId;
             for (depId in queuedCloses) {
@@ -112,7 +106,7 @@ function watchify (opts) {
                 addDep(queuedDeps[depId]);
             }
             queuedDeps = {};
-        });
+        }
         return outStream;
     };
     

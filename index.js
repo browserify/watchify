@@ -62,6 +62,9 @@ function watchify (opts) {
     }
     
     var bundle = b.bundle.bind(b);
+    var firstFiles = [];
+    b.on('file', function (file) { firstFiles.push(file) });
+    
     b.bundle = function (opts_, cb) {
         if (b._pending) return bundle(opts_, cb);
         
@@ -73,12 +76,31 @@ function watchify (opts) {
         if (!first) opts_.cache = cache;
         opts_.includePackage = true;
         opts_.packageCache = pkgcache;
-        first = false;
         
         // we only want to mess with the listeners if the bundle was created
         // successfully, e.g. on the 'close' event.
         var outStream = bundle(opts_, cb);
+        outStream.on('error', function () {
+            var watches = firstFiles.map(function (file) {
+                var w = fs.watch(file);
+                w.on('change', function () {
+                    setTimeout(
+                        function () { onchange(file) },
+                        opts.delay || 300
+                    );
+                });
+                return w;
+            });
+            var changed = false;
+            function onchange (file) {
+                if (changed) return;
+                changed = true;
+                watches.forEach(function (w) { w.close() });
+                b.emit('update', file);
+            }
+        });
         outStream.on('close', function() {
+            first = false;
             var depId;
             for (depId in queuedCloses) {
                 queuedCloses[depId].close();

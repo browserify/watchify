@@ -7,7 +7,7 @@
   "dependencies": {
     "browserify": ">=2.23.1 <4.0.0",
     "optimist": "~0.5.0",
-    "through": "~2.2.1"
+    "through": "~2.3.4"
   },
   "repository": {
     "type": "git",

@@ -32,9 +32,7 @@ function watchify (opts) {
         pkgcache[file] = pkg;
     });
     
-    var lastDep;
     b.on('dep', function (dep) {
-        lastDep = dep;
         queuedDeps[dep.id] = dep;
     });
     
@@ -80,9 +78,10 @@ function watchify (opts) {
         // successfully, e.g. on the 'close' event.
         var outStream = bundle(opts_, cb);
         outStream.on('error', function (err) {
+            var updated = false;
+            b.once('update', function () { updated = true });
+            
             if (err.type === 'not found') {
-                var updated = false;
-                b.once('update', function () { updated = true });
                 (function f () {
                     if (updated) return;
                     fs.exists(err.filename, function (ex) {
@@ -91,7 +90,6 @@ function watchify (opts) {
                     });
                 })();
             }
-            else close()
         });
         outStream.on('close', close);
         function close () {

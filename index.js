@@ -83,6 +83,7 @@ function watchify (opts) {
         outStream.on('error', function () {
             var watches = firstFiles.map(function (file) {
                 var w = fs.watch(file);
+                w.on('error', function () {});
                 w.on('change', function () {
                     setTimeout(
                         function () { onchange(file) },

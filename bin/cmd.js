@@ -19,9 +19,12 @@ var dotfile = path.join(path.dirname(outfile), '.' + path.basename(outfile));
 w.on('update', bundle);
 bundle();
 
+var errored = false, first = true;
 function bundle () {
     var wb = w.bundle();
+    var caught = false;
     wb.on('error', function (err) {
+        errored = true;
         console.error(String(err));
     });
     wb.pipe(fs.createWriteStream(dotfile));
@@ -31,6 +34,11 @@ function bundle () {
     function write (buf) { bytes += buf.length }
     
     function end () {
+        if (errored && !first) {
+            errored = false;
+            return;
+        }
+        first = false;
         fs.rename(dotfile, outfile, function (err) {
             if (err) return console.error(err);
             if (verbose) {

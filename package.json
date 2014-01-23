@@ -16,6 +16,7 @@
   "homepage": "https://github.com/substack/watchify",
   "keywords": [
     "browserify",
+    "browserify-tool",
     "watch",
     "bundle",
     "build",

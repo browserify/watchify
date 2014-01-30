@@ -1,4 +1,5 @@
 var through = require('through');
+var copy = require('shallow-copy');
 var browserify = require('browserify');
 var fs = require('fs');
 
@@ -33,7 +34,7 @@ function watchify (opts) {
     });
     
     b.on('dep', function (dep) {
-        queuedDeps[dep.id] = dep;
+        queuedDeps[dep.id] = copy(dep);
     });
     
     function addDep (dep) {

@@ -7,6 +7,7 @@
   "dependencies": {
     "browserify": ">=3.21.1 <4.0.0",
     "optimist": "~0.5.0",
+    "shallow-copy": "0.0.1",
     "through": "~2.3.4"
   },
   "repository": {

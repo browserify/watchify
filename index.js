@@ -56,8 +56,8 @@ function watchify (opts) {
                 pending = false;
                 b.emit('update', Object.keys(changingDeps));
                 changingDeps = {};
-            }, opts.delay || 300);
             
+            }, opts.delay || 600);
             pending = true;
         });
     }
@@ -87,7 +87,7 @@ function watchify (opts) {
                     if (updated) return;
                     fs.exists(err.filename, function (ex) {
                         if (ex) b.emit('update', [ err.filename ])
-                        else setTimeout(f, opts.delay || 300)
+                        else setTimeout(f, opts.delay || 600)
                     });
                 })();
             }

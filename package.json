@@ -1,6 +1,6 @@
 {
   "name": "watchify",
-  "version": "0.5.5",
+  "version": "0.5.6",
   "description": "watch mode for browserify builds",
   "main": "index.js",
   "bin": "bin/cmd.js",

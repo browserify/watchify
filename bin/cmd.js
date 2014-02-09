@@ -9,6 +9,13 @@ var fromArgs = require('browserify/bin/args');
 var w, outfile, verbose, dotfile;
 var prevErr, first = true;
 
+function showError (err) {
+    if (String(err) !== String(prevErr)) {
+        console.error(err);
+    }
+    prevErr = err;
+}
+
 (function retry () {
     w = watchify(fromArgs(process.argv.slice(2)));
     outfile = w.argv.o || w.argv.outfile;
@@ -22,11 +29,8 @@ var prevErr, first = true;
     
     w.on('update', bundle);
     w.once('error', function (err) {
-        if (String(err) !== String(prevErr)) {
-            console.error(err);
-        }
-        prevErr = err;
-        retry();
+        showError(err);
+        setTimeout(retry, w.argv.delay || 600);
     });
     bundle();
 })();
@@ -34,9 +38,7 @@ var prevErr, first = true;
 function bundle () {
     var wb = w.bundle();
     var caught = false;
-    wb.on('error', function (err) {
-        console.error(String(err));
-    });
+    wb.on('error', showError);
     wb.pipe(fs.createWriteStream(dotfile));
     var bytes = 0;
     wb.pipe(through(write, end));

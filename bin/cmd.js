@@ -30,6 +30,7 @@ function showError (err) {
     w.on('update', bundle);
     w.on('error', function (err) {
         showError(err);
+        w.removeListener('update', bundle);
         setTimeout(retry, w.argv.delay || 600);
     });
     bundle();
@@ -51,6 +52,7 @@ function bundle () {
         prevErr = undefined;
         first = false;
         if (caught) return;
+        
         fs.rename(dotfile, outfile, function (err) {
             if (err) return console.error(err);
             if (verbose) {

@@ -37,29 +37,58 @@ function watchify (opts) {
         queuedDeps[dep.id] = copy(dep);
     });
     
+    var fwatchers = {};
+    b.on('bundle', function (bundle) {
+        bundle.on('transform', function (tr, mfile) {
+            if (!fwatchers[mfile]) fwatchers[mfile] = [];
+            
+            tr.on('file', function (file) {
+                var w = fs.watch(file);
+                w.on('change', function () {
+                    invalidate(mfile);
+                });
+                fwatchers[mfile].push(w);
+                
+                console.log('FILE', file, mfile);
+            });
+        });
+    });
+    
+    var watchers = {};
     function addDep (dep) {
         if (watching[dep.id]) return;
         watching[dep.id] = true;
         cache[dep.id] = dep;
         
         var watcher = fs.watch(dep.id);
+        watchers[dep.id] = watcher;
         watcher.on('error', function (err) {
             b.emit('error', err);
         });
-        watcher.on('change', function(path) {
-            delete cache[dep.id];
-            queuedCloses[dep.id] = watcher;
-            changingDeps[dep.id] = true
-            
-            // wait for the disk/editor to quiet down first:
-            if (!pending) setTimeout(function () {
-                pending = false;
-                b.emit('update', Object.keys(changingDeps));
-                changingDeps = {};
-            
-            }, opts.delay || 600);
-            pending = true;
+        watcher.on('change', function () {
+            invalidate(dep.id);
         });
+    }
+    
+    function invalidate (id) {
+        delete cache[id];
+        if (fwatchers[id]) {
+            fwatchers[id].forEach(function (w) {
+                queuedCloses[id + '-' + id] = w;
+            });
+            delete fwatchers[id];
+        }
+        queuedCloses[id] = watchers[id];
+        changingDeps[id] = true
+        
+        // wait for the disk/editor to quiet down first:
+        if (!pending) setTimeout(function () {
+            pending = false;
+            b.emit('update', Object.keys(changingDeps));
+            changingDeps = {};
+        
+        }, opts.delay || 600);
+        pending = true;
     }
     
     var bundle = b.bundle.bind(b);

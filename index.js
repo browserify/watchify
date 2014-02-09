@@ -40,10 +40,12 @@ function watchify (opts) {
     var fwatchers = {};
     b.on('bundle', function (bundle) {
         bundle.on('transform', function (tr, mfile) {
+            tr.on('error', b.emit.bind(b, 'error'));
             if (!fwatchers[mfile]) fwatchers[mfile] = [];
             
             tr.on('file', function (file) {
                 var w = fs.watch(file);
+                w.on('error', b.emit.bind(b, 'error'));
                 w.on('change', function () {
                     invalidate(mfile);
                 });
@@ -62,9 +64,7 @@ function watchify (opts) {
         
         var watcher = fs.watch(dep.id);
         watchers[dep.id] = watcher;
-        watcher.on('error', function (err) {
-            b.emit('error', err);
-        });
+        watcher.on('error', b.emit.bind(b, 'error'));
         watcher.on('change', function () {
             invalidate(dep.id);
         });

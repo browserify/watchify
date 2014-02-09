@@ -44,14 +44,14 @@ function watchify (opts) {
             if (!fwatchers[mfile]) fwatchers[mfile] = [];
             
             tr.on('file', function (file) {
+                if (fwatchers[mfile].indexOf(file) >= 0) return;
+                
                 var w = fs.watch(file);
                 w.on('error', b.emit.bind(b, 'error'));
                 w.on('change', function () {
                     invalidate(mfile);
                 });
                 fwatchers[mfile].push(w);
-                
-                console.log('FILE', file, mfile);
             });
         });
     });

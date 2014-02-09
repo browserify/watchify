@@ -28,7 +28,7 @@ function showError (err) {
     dotfile = path.join(path.dirname(outfile), '.' + path.basename(outfile));
     
     w.on('update', bundle);
-    w.once('error', function (err) {
+    w.on('error', function (err) {
         showError(err);
         setTimeout(retry, w.argv.delay || 600);
     });
@@ -38,16 +38,19 @@ function showError (err) {
 function bundle () {
     var wb = w.bundle();
     var caught = false;
-    wb.on('error', showError);
+    wb.on('error', function (err) {
+        showError(err);
+        caught = true;
+    });
     wb.pipe(fs.createWriteStream(dotfile));
     var bytes = 0;
     wb.pipe(through(write, end));
     
     function write (buf) { bytes += buf.length }
-    
     function end () {
         prevErr = undefined;
         first = false;
+        if (caught) return;
         fs.rename(dotfile, outfile, function (err) {
             if (err) return console.error(err);
             if (verbose) {

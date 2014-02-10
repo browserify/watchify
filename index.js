@@ -38,11 +38,13 @@ function watchify (opts) {
     });
     
     var fwatchers = {};
+    var fwatcherFiles = {};
     b.on('bundle', function (bundle) {
         bundle.on('transform', function (tr, mfile) {
             tr.on('error', b.emit.bind(b, 'error'));
             if (!fwatchers[mfile]) fwatchers[mfile] = [];
-            
+            if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
+
             tr.on('file', function (file) {
                 if (fwatchers[mfile].indexOf(file) >= 0) return;
                 
@@ -52,6 +54,7 @@ function watchify (opts) {
                     invalidate(mfile);
                 });
                 fwatchers[mfile].push(w);
+                fwatcherFiles[mfile].push(file);
             });
         });
     });
@@ -77,6 +80,7 @@ function watchify (opts) {
                 queuedCloses[id + '-' + id] = w;
             });
             delete fwatchers[id];
+            delete fwatcherFiles[id];
         }
         queuedCloses[id] = watchers[id];
         changingDeps[id] = true

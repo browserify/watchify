@@ -13,6 +13,7 @@ function watchify (opts) {
     var pkgcache = {};
     var watching = {};
     var pending = false;
+    var lastUpdated = 0;
     var queuedCloses = {};
     var queuedDeps = {};
     var changingDeps = {};
@@ -85,14 +86,16 @@ function watchify (opts) {
         queuedCloses[id] = watchers[id];
         changingDeps[id] = true
         
-        // wait for the disk/editor to quiet down first:
-        if (!pending) setTimeout(function () {
-            pending = false;
-            b.emit('update', Object.keys(changingDeps));
-            changingDeps = {};
-        
-        }, opts.delay || 600);
-        pending = true;
+        if (opts.debounce && Date.now() - lastUpdated > opts.debounce) {
+            // wait for the disk/editor to quiet down first:
+            if (!pending) setTimeout(function () {
+                lastUpdated = Date.now();
+                pending = false;
+                b.emit('update', Object.keys(changingDeps));
+                changingDeps = {};
+            }, opts.delay || 600);
+            pending = true;
+        }
     }
     
     var bundle = b.bundle.bind(b);

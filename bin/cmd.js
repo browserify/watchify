@@ -17,7 +17,10 @@ function showError (err) {
 }
 
 (function retry () {
-    w = watchify(fromArgs(process.argv.slice(2)));
+    var b = fromArgs(process.argv.slice(2));
+    if (b.argv.delay) {b.delay = b.argv.delay};
+    if (b.argv.debounce) {b.debounce = b.argv.debounce};
+    w = watchify(b);
     outfile = w.argv.o || w.argv.outfile;
     verbose = w.argv.v || w.argv.verbose;
     

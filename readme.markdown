@@ -31,7 +31,11 @@ $ watchify browser.js -d -o static/bundle.js -v
 
 # usage
 
-All the bundle options are the same as the browserify command except for `-v`.
+All the bundle options are the same as the browserify command except for:
+
+* **-v:** get more verbose output to show when a file was written.
+* **--delay**: time in ms to wait for events to settle before updating the bundle (default 600).
+* **--debounce**: time in ms after update during which further events don't trigger another update. This is useful on OSX, where a single write often triggers two events, space several seconds apart (default 0).
 
 # methods
 

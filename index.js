@@ -2,6 +2,7 @@ var through = require('through');
 var copy = require('shallow-copy');
 var browserify = require('browserify');
 var fs = require('fs');
+var chokidar = require('chokidar');
 
 module.exports = watchify;
 watchify.browserify = browserify;
@@ -48,7 +49,7 @@ function watchify (opts) {
             tr.on('file', function (file) {
                 if (fwatchers[mfile].indexOf(file) >= 0) return;
                 
-                var w = fs.watch(file);
+                var w = chokidar.watch(file);
                 w.on('error', b.emit.bind(b, 'error'));
                 w.on('change', function () {
                     invalidate(mfile);
@@ -65,7 +66,7 @@ function watchify (opts) {
         watching[dep.id] = true;
         cache[dep.id] = dep;
         
-        var watcher = fs.watch(dep.id);
+        var watcher = chokidar.watch(dep.id);
         watchers[dep.id] = watcher;
         watcher.on('error', b.emit.bind(b, 'error'));
         watcher.on('change', function () {

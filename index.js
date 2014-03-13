@@ -42,7 +42,6 @@ function watchify (opts) {
     var fwatcherFiles = {};
     b.on('bundle', function (bundle) {
         bundle.on('transform', function (tr, mfile) {
-            tr.on('error', b.emit.bind(b, 'error'));
             if (!fwatchers[mfile]) fwatchers[mfile] = [];
             if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
 

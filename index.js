@@ -46,6 +46,7 @@ function watchify (opts) {
             if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
 
             tr.on('file', function (file) {
+                if (!fwatchers[mfile]) return;
                 if (fwatchers[mfile].indexOf(file) >= 0) return;
                 
                 var w = fs.watch(file);

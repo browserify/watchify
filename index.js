@@ -49,7 +49,7 @@ function watchify (opts) {
                 if (!fwatchers[mfile]) return;
                 if (fwatchers[mfile].indexOf(file) >= 0) return;
                 
-                var w = chokidar.watch(file);
+                var w = chokidar.watch(file, {persistent: true});
                 w.on('error', b.emit.bind(b, 'error'));
                 w.on('change', function () {
                     invalidate(mfile);
@@ -66,7 +66,7 @@ function watchify (opts) {
         watching[dep.id] = true;
         cache[dep.id] = dep;
         
-        var watcher = chokidar.watch(dep.id);
+        var watcher = chokidar.watch(dep.id, {persistent: true});
         watchers[dep.id] = watcher;
         watcher.on('error', b.emit.bind(b, 'error'));
         watcher.on('change', function () {

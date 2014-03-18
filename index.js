@@ -83,7 +83,9 @@ function watchify (opts) {
             delete fwatchers[id];
             delete fwatcherFiles[id];
         }
-        queuedCloses[id] = watchers[id];
+        if (watchers[id]) {
+            queuedCloses[id] = watchers[id];
+        }
         changingDeps[id] = true
         
         // wait for the disk/editor to quiet down first:

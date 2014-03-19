@@ -2,6 +2,7 @@ var through = require('through');
 var copy = require('shallow-copy');
 var browserify = require('browserify');
 var fs = require('fs');
+var chokidar = require('chokidar');
 
 module.exports = watchify;
 watchify.browserify = browserify;
@@ -41,7 +42,6 @@ function watchify (opts) {
     var fwatcherFiles = {};
     b.on('bundle', function (bundle) {
         bundle.on('transform', function (tr, mfile) {
-            tr.on('error', b.emit.bind(b, 'error'));
             if (!fwatchers[mfile]) fwatchers[mfile] = [];
             if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
 
@@ -49,7 +49,7 @@ function watchify (opts) {
                 if (!fwatchers[mfile]) return;
                 if (fwatchers[mfile].indexOf(file) >= 0) return;
                 
-                var w = fs.watch(file);
+                var w = chokidar.watch(file, {persistent: true});
                 w.on('error', b.emit.bind(b, 'error'));
                 w.on('change', function () {
                     invalidate(mfile);
@@ -66,7 +66,7 @@ function watchify (opts) {
         watching[dep.id] = true;
         cache[dep.id] = dep;
         
-        var watcher = fs.watch(dep.id);
+        var watcher = chokidar.watch(dep.id, {persistent: true});
         watchers[dep.id] = watcher;
         watcher.on('error', b.emit.bind(b, 'error'));
         watcher.on('change', function () {

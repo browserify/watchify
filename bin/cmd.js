@@ -11,7 +11,7 @@ var prevErr, first = true;
 
 function showError (err) {
     if (String(err) !== String(prevErr)) {
-        console.error(err);
+        console.error(err + '');
     }
     prevErr = err;
 }

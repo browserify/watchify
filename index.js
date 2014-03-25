@@ -18,6 +18,7 @@ function watchify (opts) {
     var queuedDeps = {};
     var changingDeps = {};
     var first = true;
+    var watchers = {};
     
     if (opts.cache) {
         cache = opts.cache;
@@ -28,6 +29,11 @@ function watchify (opts) {
     if (opts.pkgcache) {
         pkgcache = opts.pkgcache;
         delete opts.pkgcache;
+    }
+
+    if (opts.watchers) {
+        watchers = opts.watchers;
+        delete opts.watchers;
     }
     
     b.on('package', function (file, pkg) {
@@ -60,14 +66,17 @@ function watchify (opts) {
         });
     });
     
-    var watchers = {};
     function addDep (dep) {
         if (watching[dep.id]) return;
         watching[dep.id] = true;
         cache[dep.id] = dep;
         
-        var watcher = chokidar.watch(dep.id, {persistent: true});
-        watchers[dep.id] = watcher;
+        var watcher = watchers[dep.id];
+        if (!watcher) {
+            watcher = watchers[dep.id] = chokidar.watch(dep.id, {persistent: true});
+            b.emit('watch', watcher, dep);
+        }
+
         watcher.on('error', b.emit.bind(b, 'error'));
         watcher.on('change', function () {
             invalidate(dep.id);

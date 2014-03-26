@@ -20,7 +20,7 @@ function watchify (opts) {
     var changingDeps = {};
     var first = true;
     var watchers = {};
-    var listeners = { change: {}, err: {} };
+    var listeners = {};
     
     if (opts.cache) {
         cache = opts.cache;
@@ -79,13 +79,15 @@ function watchify (opts) {
             b.emit('watch', watcher, dep);
         }
 
-        listeners.err[dep.id] = b.emit.bind(b, 'error');
-        listeners.change[dep.id] = function () {
-            invalidate(dep.id);
+        listeners[dep.id] = { 
+            err: b.emit.bind(b, 'error'),
+            change: function () {
+                invalidate(dep.id);
+            }
         };
         
-        watcher.on('error', listeners.err[dep.id]);
-        watcher.on('change', listeners.change[dep.id]);
+        watcher.on('error', listeners[dep.id].err);
+        watcher.on('change', listeners[dep.id].change);
     }
     
     function invalidate (id) {
@@ -146,8 +148,8 @@ function watchify (opts) {
             var depId, watcher;
             for (depId in queuedCloses) {
                 watcher = watchers[depId];
-                watcher.removeListener('change', listeners.change[depId]);
-                watcher.removeListener('error', listeners.err[depId]);
+                watcher.removeListener('change', listeners[depId].change);
+                watcher.removeListener('error', listeners[depId].err);
                 if (!listenerCount(watcher, 'change') && !listenerCount(watcher, 'error')) {
                     watcher.close();
                     watchers[depId] = null;

@@ -3,6 +3,7 @@ var copy = require('shallow-copy');
 var browserify = require('browserify');
 var fs = require('fs');
 var chokidar = require('chokidar');
+var listenerCount = require('events').EventEmitter.listenerCount;
 
 module.exports = watchify;
 watchify.browserify = browserify;
@@ -19,6 +20,7 @@ function watchify (opts) {
     var changingDeps = {};
     var first = true;
     var watchers = {};
+    var listeners = { change: {}, err: {} };
     
     if (opts.cache) {
         cache = opts.cache;
@@ -77,10 +79,13 @@ function watchify (opts) {
             b.emit('watch', watcher, dep);
         }
 
-        watcher.on('error', b.emit.bind(b, 'error'));
-        watcher.on('change', function () {
+        listeners.err[dep.id] = b.emit.bind(b, 'error');
+        listeners.change[dep.id] = function () {
             invalidate(dep.id);
-        });
+        };
+        
+        watcher.on('error', listeners.err[dep.id]);
+        watcher.on('change', listeners.change[dep.id]);
     }
     
     function invalidate (id) {
@@ -138,9 +143,15 @@ function watchify (opts) {
         outStream.on('close', close);
         function close () {
             first = false;
-            var depId;
+            var depId, watcher;
             for (depId in queuedCloses) {
-                queuedCloses[depId].close();
+                watcher = watchers[depId];
+                watcher.removeListener('change', listeners.change[depId]);
+                watcher.removeListener('error', listeners.err[depId]);
+                if (!listenerCount(watcher, 'change') && !listenerCount(watcher, 'error')) {
+                    watcher.close();
+                    watchers[depId] = null;
+                }
                 watching[depId] = false;
             }
             queuedCloses = {};

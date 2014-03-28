@@ -3,6 +3,7 @@ var copy = require('shallow-copy');
 var browserify = require('browserify');
 var fs = require('fs');
 var chokidar = require('chokidar');
+var listenerCount = require('events').EventEmitter.listenerCount;
 
 module.exports = watchify;
 watchify.browserify = browserify;
@@ -18,6 +19,8 @@ function watchify (opts) {
     var queuedDeps = {};
     var changingDeps = {};
     var first = true;
+    var watchers = {};
+    var listeners = {};
     
     if (opts.cache) {
         cache = opts.cache;
@@ -28,6 +31,11 @@ function watchify (opts) {
     if (opts.pkgcache) {
         pkgcache = opts.pkgcache;
         delete opts.pkgcache;
+    }
+
+    if (opts.watchers) {
+        watchers = opts.watchers;
+        delete opts.watchers;
     }
     
     b.on('package', function (file, pkg) {
@@ -60,18 +68,26 @@ function watchify (opts) {
         });
     });
     
-    var watchers = {};
     function addDep (dep) {
         if (watching[dep.id]) return;
         watching[dep.id] = true;
         cache[dep.id] = dep;
         
-        var watcher = chokidar.watch(dep.id, {persistent: true});
-        watchers[dep.id] = watcher;
-        watcher.on('error', b.emit.bind(b, 'error'));
-        watcher.on('change', function () {
-            invalidate(dep.id);
-        });
+        var watcher = watchers[dep.id];
+        if (!watcher) {
+            watcher = watchers[dep.id] = chokidar.watch(dep.id, {persistent: true});
+            b.emit('watch', watcher, dep);
+        }
+
+        listeners[dep.id] = { 
+            err: b.emit.bind(b, 'error'),
+            change: function () {
+                invalidate(dep.id);
+            }
+        };
+        
+        watcher.on('error', listeners[dep.id].err);
+        watcher.on('change', listeners[dep.id].change);
     }
     
     function invalidate (id) {
@@ -129,9 +145,15 @@ function watchify (opts) {
         outStream.on('close', close);
         function close () {
             first = false;
-            var depId;
+            var depId, watcher;
             for (depId in queuedCloses) {
-                queuedCloses[depId].close();
+                watcher = watchers[depId];
+                watcher.removeListener('change', listeners[depId].change);
+                watcher.removeListener('error', listeners[depId].err);
+                if (!listenerCount(watcher, 'change') && !listenerCount(watcher, 'error')) {
+                    watcher.close();
+                    watchers[depId] = null;
+                }
                 watching[depId] = false;
             }
             queuedCloses = {};

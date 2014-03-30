@@ -2,7 +2,7 @@
 
 Watch mode for [browserify](https://github.com/substack/node-browserify) builds.
 
-Update any source file and your browserify bundle will be recompiled on the
+Update any source file and your `browserify` bundle will be recompiled on the
 spot.
 
 ## install
@@ -67,7 +67,7 @@ var w = watchify({
 
 ## 'update' event
 
-`w` is exactly like a browserify bundle except that caches file contents and
+`w` is exactly like a `browserify` bundle except that caches file contents and
 emits an `'update'` event when a file changes. You should call `w.bundle()`
 after the `'update'` event fires to generate a new bundle:
 

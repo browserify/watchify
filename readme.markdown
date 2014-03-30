@@ -1,11 +1,25 @@
-# watchify
+## watchify
 
-watch mode for browserify builds
+Watch mode for [browserify](https://github.com/substack/node-browserify) builds.
 
 Update any source file and your browserify bundle will be recompiled on the
 spot.
 
-# example
+## install
+
+```
+$ npm install -g watchify
+```
+
+to get the global `watchify` command, and
+
+```
+$ npm install watchify
+```
+
+to get just the library.
+
+## command-line usage
 
 Use `watchify` with all the same arguments as `browserify` except that
 `-o` is mandatory:
@@ -29,47 +43,58 @@ $ watchify browser.js -d -o static/bundle.js -v
 610597 bytes written to static/bundle.js
 ```
 
-# usage
+All the [bundle options](https://github.com/substack/node-browserify#usage) are the same as the `browserify` command except for `-v`.
 
-All the bundle options are the same as the browserify command except for `-v`.
+## commonjs module usage
 
-# methods
-
-``` js
+```js
 var watchify = require('watchify')
+
+// create a browserify bundle `w` from `opts`
+var w = watchify(opts)
 ```
 
-## var w = watchify(opts)
+`opts` are passed in [similarly to](https://github.com/substack/node-browserify#var-b--browserifyfiles-or-opts) `browserify`:
 
-Create a browserify bundle `w` from `opts`.
+```js
+var w = watchify('./public/js/main.js');
+
+// or:
+var w = watchify({
+  entries: ['./public/js/main.js']
+});
+```
+
+## 'update' event
 
 `w` is exactly like a browserify bundle except that caches file contents and
 emits an `'update'` event when a file changes. You should call `w.bundle()`
-after the `'update'` event fires to generate a new bundle. Calling `w.bundle()`
-extra times past the first time will be much faster due to caching.
+after the `'update'` event fires to generate a new bundle:
 
-# events
+```js
+w.on('update', rebundle);
 
-## w.on('update', function (ids) {})
+function rebundle(ids) {
+  // emit the list of altered file ids
+  console.log(ids)
 
-When the bundle changes, emit the array of bundle `ids` that changed.
-
-# install
-
-With [npm](https://npmjs.org) do:
-
-```
-$ npm install -g watchify
+  return w.bundle({ debug: true })
+}
 ```
 
-to get the watchify command and:
+Calling `w.bundle()` extra times past the first time will be much faster due to caching.
 
+## transform, require, external, and other functions
+
+Again, these are utilized similarly to a vanilla `browserify` implementation:
+
+```js
+w.transform('brfs');
+
+w.external('angular');
+w.external('angular-route');
 ```
-$ npm install watchify
-```
 
-to get just the library.
-
-# license
+## license
 
 MIT

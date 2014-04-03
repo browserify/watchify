@@ -16,7 +16,7 @@ Use `watchify` with all the same arguments as `browserify` except that
 $ watchify main.js -o static/bundle.js
 ```
 
-Now as you update files, `static/bundle.js` will be automatically re-compiled on
+Now as you update files, `static/bundle.js` will be automatically incrementally rebuilt on
 the fly.
 
 You can use `-v` to get more verbose output to show when a file was written and how long the bundling took (in seconds):

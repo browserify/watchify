@@ -2,8 +2,8 @@
 
 watch mode for browserify builds
 
-Update any source file and your browserify bundle will be recompiled on the
-spot.
+Update any source file and your browserify bundle will be incrementally rebuilt 
+on the spot.
 
 # example
 

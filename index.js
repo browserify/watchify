@@ -110,7 +110,7 @@ function watchify (opts) {
         opts_.packageCache = pkgcache;
         
         // we only want to mess with the listeners if the bundle was created
-        // successfully, e.g. on the 'close' event.
+        // successfully, e.g. on the 'end' event.
         var outStream = bundle(opts_, cb);
         outStream.on('error', function (err) {
             var updated = false;
@@ -126,8 +126,8 @@ function watchify (opts) {
                 })();
             }
         });
-        outStream.on('close', close);
-        function close () {
+        outStream.on('end', end);
+        function end () {
             first = false;
             var depId;
             for (depId in queuedCloses) {

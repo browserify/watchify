@@ -47,7 +47,7 @@ function watchify (opts) {
 
             tr.on('file', function (file) {
                 if (!fwatchers[mfile]) return;
-                if (fwatchers[mfile].indexOf(file) >= 0) return;
+                if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
                 
                 var w = chokidar.watch(file, {persistent: true});
                 w.on('error', b.emit.bind(b, 'error'));

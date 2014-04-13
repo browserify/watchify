@@ -29,5 +29,10 @@
     "email": "mail@substack.net",
     "url": "http://substack.net"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "mkdirp": "^0.3.5",
+    "split": "^0.3.0",
+    "tape": "^2.12.3"
+  }
 }

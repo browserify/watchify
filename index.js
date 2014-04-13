@@ -12,10 +12,7 @@ function watchify (opts) {
     var b = typeof opts.bundle === 'function' ? opts : browserify(opts);
     var cache = {};
     var pkgcache = {};
-    var watching = {};
     var pending = false;
-    var queuedCloses = {};
-    var queuedDeps = {};
     var changingDeps = {};
     var first = true;
     
@@ -33,11 +30,7 @@ function watchify (opts) {
     b.on('package', function (file, pkg) {
         pkgcache[file] = pkg;
     });
-    
-    b.on('dep', function (dep) {
-        queuedDeps[dep.id] = copy(dep);
-    });
-    
+
     var fwatchers = {};
     var fwatcherFiles = {};
     b.on('bundle', function (bundle) {
@@ -45,45 +38,36 @@ function watchify (opts) {
             if (!fwatchers[mfile]) fwatchers[mfile] = [];
             if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
 
+            watchFile(mfile, mfile);
+
             tr.on('file', function (file) {
-                if (!fwatchers[mfile]) return;
-                if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
-                
-                var w = chokidar.watch(file, {persistent: true});
-                w.on('error', b.emit.bind(b, 'error'));
-                w.on('change', function () {
-                    invalidate(mfile);
-                });
-                fwatchers[mfile].push(w);
-                fwatcherFiles[mfile].push(file);
+                watchFile(mfile, file);
             });
         });
     });
-    
-    var watchers = {};
-    function addDep (dep) {
-        if (watching[dep.id]) return;
-        watching[dep.id] = true;
-        cache[dep.id] = dep;
-        
-        var watcher = chokidar.watch(dep.id, {persistent: true});
-        watchers[dep.id] = watcher;
-        watcher.on('error', b.emit.bind(b, 'error'));
-        watcher.on('change', function () {
-            invalidate(dep.id);
+
+    function watchFile(mfile, file) {
+        if (!fwatchers[mfile]) return;
+        if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
+
+        var w = chokidar.watch(file, {persistent: true});
+        w.on('error', b.emit.bind(b, 'error'));
+        w.on('change', function () {
+            invalidate(mfile);
         });
+        fwatchers[mfile].push(w);
+        fwatcherFiles[mfile].push(file);
     }
     
     function invalidate (id) {
         delete cache[id];
         if (fwatchers[id]) {
             fwatchers[id].forEach(function (w) {
-                queuedCloses[id + '-' + id] = w;
+                w.close();
             });
             delete fwatchers[id];
             delete fwatcherFiles[id];
         }
-        queuedCloses[id] = watchers[id];
         changingDeps[id] = true
         
         // wait for the disk/editor to quiet down first:
@@ -129,16 +113,6 @@ function watchify (opts) {
         outStream.on('end', end);
         function end () {
             first = false;
-            var depId;
-            for (depId in queuedCloses) {
-                queuedCloses[depId].close();
-                watching[depId] = false;
-            }
-            queuedCloses = {};
-            for (depId in queuedDeps) {
-                addDep(queuedDeps[depId]);
-            }
-            queuedDeps = {};
         }
         return outStream;
     };

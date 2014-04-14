@@ -67,6 +67,7 @@ function watchify (opts) {
         cache[dep.id] = dep;
         
         var watcher = chokidar.watch(dep.id, {persistent: true});
+console.log('LISTEN', dep.id);
         watchers[dep.id] = watcher;
         watcher.on('error', b.emit.bind(b, 'error'));
         watcher.on('change', function () {
@@ -111,7 +112,9 @@ function watchify (opts) {
         
         // we only want to mess with the listeners if the bundle was created
         // successfully, e.g. on the 'end' event.
-        var outStream = bundle(opts_, cb);
+        var outStream = bundle(opts_, function (err, b) {
+            if (cb) process.nextTick(function () { cb(err, b) });
+        });
         outStream.on('error', function (err) {
             var updated = false;
             b.once('update', function () { updated = true });

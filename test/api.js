@@ -11,17 +11,14 @@ var split = require('split');
 var os = require('os');
 var tmpdir = path.join((os.tmpdir || os.tmpDir)(), 'watchify-' + Math.random());
 
-var files = {
-    main: path.join(tmpdir, 'main.js'),
-    bundle: path.join(tmpdir, 'bundle.js')
-};
+var file = path.join(tmpdir, 'main.js');
 
 mkdirp.sync(tmpdir);
-fs.writeFileSync(files.main, 'console.log(555)');
+fs.writeFileSync(file, 'console.log(555)');
 
 test('api', function (t) {
     t.plan(5);
-    var w = watchify(browserify(files.main));
+    var w = watchify(browserify(file));
     w.on('update', function () {
         w.bundle(function (err, src) {
             t.ifError(err);
@@ -32,7 +29,8 @@ test('api', function (t) {
     w.bundle(function (err, src) {
         t.ifError(err);
         t.equal(run(src), '555\n');
-        fs.writeFile(files.main, 'console.log(333)', function (err) {
+console.log('WRITE', file);
+        fs.writeFile(file, 'console.log(333)', function (err) {
             t.ifError(err);
         });
     });

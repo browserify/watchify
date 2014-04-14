@@ -14,7 +14,7 @@ var files = {
     bundle: path.join(tmpdir, 'bundle.js')
 };
 
-mkdirp(tmpdir);
+mkdirp.sync(tmpdir);
 fs.writeFileSync(files.main, 'console.log(555)');
 
 test('bin', function (t) {

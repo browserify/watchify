@@ -19,12 +19,16 @@ var files = {
 var edits = [
     { file: 'lines', source: 'robo-boogie' },
     { file: 'lines', source: 'dinosaurus rex' },
-    { file: 'robot', source: 'module.exports = function (n) { return n * 111 }' },
+    {
+        file: 'robot',
+        source: 'module.exports = function (n) { return n * 111 }',
+        next: true
+    },
     { file: 'main', source: [
         'var fs = require("fs");',
         'var robot = require("./robot.js");',
         'var src = fs.readFileSync(__dirname + "/lines.txt", "utf8");',
-        'console.log(src.toUpperCase() + robot(src.length));'
+        'console.log(src.toUpperCase() + " " + robot(src.length));'
     ].join('\n') },
     { file: 'lines', source: 't-rex' },
 ];
@@ -33,7 +37,8 @@ var expected = [
     'BEEP\nBOOP\n',
     'ROBO-BOOGIE\n',
     'DINOSAURUS REX\n',
-    'T-REX\n5'
+    'DINOSAURUS REX 1554\n',
+    'T-REX 5\n'
 ];
 
 mkdirp.sync(tmpdir);
@@ -47,16 +52,23 @@ fs.writeFileSync(files.lines, 'beep\nboop');
 test('many edits', function (t) {
     t.plan(10);
     var ps = spawn(cmd, [ files.main, '-t', 'brfs', '-o', files.bundle, '-v' ]);
+    ps.stdout.pipe(process.stdout);
+    ps.stderr.pipe(process.stdout);
     var lineNum = 0;
     ps.stderr.pipe(split()).on('data', function (line) {
         run(files.bundle, function (err, output) {
             t.ifError(err);
             t.equal(output, expected.shift());
             
-            var edit = edits.shift();
-            setTimeout(function () {
-                fs.writeFile(files[edit.file], edit.source);
-            }, 250);
+            (function next () {
+                var edit = edits.shift();
+                setTimeout(function () {
+                    fs.writeFile(files[edit.file], edit.source, function (err) {
+                        if (err) t.error(err);
+                        if (edit.next) next();
+                    });
+                }, 250);
+            })();
         })
     });
     

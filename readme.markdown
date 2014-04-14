@@ -2,6 +2,8 @@
 
 watch mode for browserify builds
 
+[![build status](https://secure.travis-ci.org/substack/watchify.png)](http://travis-ci.org/substack/watchify)
+
 Update any source file and your browserify bundle will be recompiled on the
 spot.
 

@@ -29,10 +29,11 @@ test('api', function (t) {
     w.bundle(function (err, src) {
         t.ifError(err);
         t.equal(run(src), '555\n');
-console.log('WRITE', file);
-        fs.writeFile(file, 'console.log(333)', function (err) {
-            t.ifError(err);
-        });
+        setTimeout(function () {
+            fs.writeFile(file, 'console.log(333)', function (err) {
+                t.ifError(err);
+            });
+        }, 1000);
     });
 });
 

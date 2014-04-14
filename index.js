@@ -61,14 +61,18 @@ function watchify (opts) {
     });
     
     var watchers = {};
+    var adding = 0;
     function addDep (dep) {
+        adding ++;
         if (watching[dep.id]) return;
         watching[dep.id] = true;
         cache[dep.id] = dep;
         
         var watcher = chokidar.watch(dep.id, {persistent: true});
-console.log('LISTEN', dep.id);
         watchers[dep.id] = watcher;
+        watcher.on('add', function () {
+            if (-- adding === 0) b.emit('_addingReady');
+        });
         watcher.on('error', b.emit.bind(b, 'error'));
         watcher.on('change', function () {
             invalidate(dep.id);
@@ -98,6 +102,15 @@ console.log('LISTEN', dep.id);
     }
     
     var bundle = b.bundle.bind(b);
+    b.close = function () {
+        Object.keys(fwatchers).forEach(function (id) {
+            fwatchers[id].forEach(function (w) { w.close() });
+        });
+        Object.keys(watchers).forEach(function (id) {
+            watchers[id].close();
+        });
+    };
+    
     b.bundle = function (opts_, cb) {
         if (b._pending) return bundle(opts_, cb);
         
@@ -112,8 +125,15 @@ console.log('LISTEN', dep.id);
         
         // we only want to mess with the listeners if the bundle was created
         // successfully, e.g. on the 'end' event.
-        var outStream = bundle(opts_, function (err, b) {
-            if (cb) process.nextTick(function () { cb(err, b) });
+        var outStream = bundle(opts_, cb && function (err, src) {
+            process.nextTick(function () {
+                if (adding) {
+                    b.on('_addingReady', function () {
+                        cb(err, src);
+                    });
+                }
+                else cb(err, src);
+            });
         });
         outStream.on('error', function (err) {
             var updated = false;

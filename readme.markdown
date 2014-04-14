@@ -48,6 +48,10 @@ emits an `'update'` event when a file changes. You should call `w.bundle()`
 after the `'update'` event fires to generate a new bundle. Calling `w.bundle()`
 extra times past the first time will be much faster due to caching.
 
+## w.close()
+
+Close all the open watch handles.
+
 # events
 
 ## w.on('update', function (ids) {})

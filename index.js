@@ -63,8 +63,8 @@ function watchify (opts) {
     var watchers = {};
     var adding = 0;
     function addDep (dep) {
-        adding ++;
         if (watching[dep.id]) return;
+        adding ++;
         watching[dep.id] = true;
         cache[dep.id] = dep;
         

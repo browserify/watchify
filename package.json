@@ -34,6 +34,7 @@
   },
   "license": "MIT",
   "devDependencies": {
+    "brfs": "^1.0.1",
     "mkdirp": "^0.3.5",
     "split": "^0.3.0",
     "tape": "^2.12.3"

@@ -11,6 +11,9 @@
     "through": "~2.3.4",
     "chokidar": "^0.8.1"
   },
+  "scripts": {
+    "test": "tape test/*.js"
+  },
   "repository": {
     "type": "git",
     "url": "git://github.com/substack/watchify.git"

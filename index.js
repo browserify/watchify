@@ -55,7 +55,15 @@ function watchify (opts) {
             });
             tr.on('file', function (file) {
                 if (!fwatchers[mfile]) return;
-                if (fwatchers[mfile].indexOf(file) >= 0) return;
+                if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
+                
+                var prev = queuedCloses[mfile + '-' + file];
+                if (prev) {
+                    fwatcherFiles[mfile].push(file);
+                    fwatchers[mfile].push(prev);
+                    delete queuedCloses[mfile + '-' + file];
+                    return;
+                }
                 
                 var w = chokidar.watch(file, {persistent: true});
                 w.on('error', b.emit.bind(b, 'error'));
@@ -68,6 +76,7 @@ function watchify (opts) {
                 w.on('change', function () {
                     invalidate(mfile);
                 });
+                w.file = file;
                 fwatchers[mfile].push(w);
                 fwatcherFiles[mfile].push(file);
             });
@@ -97,7 +106,7 @@ function watchify (opts) {
         delete cache[id];
         if (fwatchers[id]) {
             fwatchers[id].forEach(function (w, ix) {
-                queuedCloses[id + '-' + ix] = w;
+                queuedCloses[id + '-' + w.file] = w;
             });
             delete fwatchers[id];
             delete fwatcherFiles[id];

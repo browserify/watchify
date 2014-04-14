@@ -97,6 +97,15 @@ function watchify (opts) {
     }
     
     var bundle = b.bundle.bind(b);
+    b.close = function () {
+        Object.keys(fwatchers).forEach(function (id) {
+            fwatchers[id].forEach(function (w) { w.close() });
+        });
+        Object.keys(watchers).forEach(function (id) {
+            watchers[id].close();
+        });
+    };
+    
     b.bundle = function (opts_, cb) {
         if (b._pending) return bundle(opts_, cb);
         

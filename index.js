@@ -40,17 +40,31 @@ function watchify (opts) {
     
     var fwatchers = {};
     var fwatcherFiles = {};
+    
     b.on('bundle', function (bundle) {
         bundle.on('transform', function (tr, mfile) {
             if (!fwatchers[mfile]) fwatchers[mfile] = [];
             if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
-
+            
+            adding ++;
+            var pending = 1;
+            tr.on('end', function () {
+                if (--pending === 0) {
+                    if (--adding === 0) b.emit('_addingReady');
+                }
+            });
             tr.on('file', function (file) {
                 if (!fwatchers[mfile]) return;
                 if (fwatchers[mfile].indexOf(file) >= 0) return;
                 
                 var w = chokidar.watch(file, {persistent: true});
                 w.on('error', b.emit.bind(b, 'error'));
+                pending ++;
+                w.on('add', function () {
+                    if (--pending === 0) {
+                        if (--adding === 0) b.emit('_addingReady');
+                    }
+                });
                 w.on('change', function () {
                     invalidate(mfile);
                 });
@@ -82,8 +96,8 @@ function watchify (opts) {
     function invalidate (id) {
         delete cache[id];
         if (fwatchers[id]) {
-            fwatchers[id].forEach(function (w) {
-                queuedCloses[id + '-' + id] = w;
+            fwatchers[id].forEach(function (w, ix) {
+                queuedCloses[id + '-' + ix] = w;
             });
             delete fwatchers[id];
             delete fwatcherFiles[id];
@@ -123,8 +137,6 @@ function watchify (opts) {
         opts_.includePackage = true;
         opts_.packageCache = pkgcache;
         
-        // we only want to mess with the listeners if the bundle was created
-        // successfully, e.g. on the 'end' event.
         var outStream = bundle(opts_, cb && function (err, src) {
             process.nextTick(function () {
                 if (adding) {

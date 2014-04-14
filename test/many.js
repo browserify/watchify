@@ -38,7 +38,7 @@ var expected = [
     'ROBO-BOOGIE\n',
     'DINOSAURUS REX\n',
     'DINOSAURUS REX 1554\n',
-    'T-REX 5\n'
+    'T-REX 555\n'
 ];
 
 mkdirp.sync(tmpdir);
@@ -50,21 +50,24 @@ fs.writeFileSync(files.main, [
 fs.writeFileSync(files.lines, 'beep\nboop');
 
 test('many edits', function (t) {
-    t.plan(10);
+    t.plan(expected.length * 2 + edits.length);
     var ps = spawn(cmd, [ files.main, '-t', 'brfs', '-o', files.bundle, '-v' ]);
     ps.stdout.pipe(process.stdout);
     ps.stderr.pipe(process.stdout);
     var lineNum = 0;
     ps.stderr.pipe(split()).on('data', function (line) {
+        if (line.length === 0) return;
+        
         run(files.bundle, function (err, output) {
             t.ifError(err);
             t.equal(output, expected.shift());
             
             (function next () {
+                if (edits.length === 0) return;
                 var edit = edits.shift();
                 setTimeout(function () {
                     fs.writeFile(files[edit.file], edit.source, function (err) {
-                        if (err) t.error(err);
+                        t.ifError(err);
                         if (edit.next) next();
                     });
                 }, 250);

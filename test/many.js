@@ -31,6 +31,10 @@ var edits = [
         'console.log(src.toUpperCase() + " " + robot(src.length));'
     ].join('\n') },
     { file: 'lines', source: 't-rex' },
+    {
+        file: 'robot',
+        source: 'module.exports = function (n) { return n * 100 }',
+    }
 ];
 
 var expected = [
@@ -38,7 +42,8 @@ var expected = [
     'ROBO-BOOGIE\n',
     'DINOSAURUS REX\n',
     'DINOSAURUS REX 1554\n',
-    'T-REX 555\n'
+    'T-REX 555\n',
+    'T-REX 500\n'
 ];
 
 mkdirp.sync(tmpdir);
@@ -70,7 +75,7 @@ test('many edits', function (t) {
                         t.ifError(err);
                         if (edit.next) next();
                     });
-                }, 250);
+                }, 25);
             })();
         })
     });

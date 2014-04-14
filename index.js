@@ -85,9 +85,6 @@ function watchify (opts) {
         Object.keys(fwatchers).forEach(function (id) {
             fwatchers[id].forEach(function (w) { w.close() });
         });
-        Object.keys(watchers).forEach(function (id) {
-            watchers[id].close();
-        });
     };
     
     b.bundle = function (opts_, cb) {

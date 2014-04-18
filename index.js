@@ -30,6 +30,10 @@ function watchify (opts) {
     b.on('package', function (file, pkg) {
         pkgcache[file] = pkg;
     });
+    
+    b.on('dep', function (dep) {
+        cache[dep.id] = dep;
+    });
 
     var fwatchers = {};
     var fwatcherFiles = {};

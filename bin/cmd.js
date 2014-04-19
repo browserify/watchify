@@ -7,13 +7,13 @@ var path = require('path');
 var fromArgs = require('browserify/bin/args');
 
 var w, outfile, verbose, dotfile;
-var prevErr, first = true;
+var prevErrs = [], first = true;
 
 function showError (err) {
-    if (String(err) !== String(prevErr)) {
+    if (prevErrs.indexOf(String(err)) < 0) {
         console.error(err + '');
+        prevErrs.push(String(err));
     }
-    prevErr = err;
 }
 
 (function retry () {
@@ -49,7 +49,7 @@ function bundle () {
     
     function write (buf) { bytes += buf.length }
     function end () {
-        prevErr = undefined;
+        prevErr = [];
         first = false;
         if (caught) return;
         

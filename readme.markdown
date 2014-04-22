@@ -19,17 +19,19 @@ $ watchify main.js -o static/bundle.js
 Now as you update files, `static/bundle.js` will be automatically re-compiled on
 the fly.
 
-You can use `-v` to get more verbose output to show when a file was written:
+You can use `-v` to get more verbose output to show when a file was written and how long the bundling took (in seconds):
 
 ```
 $ watchify browser.js -d -o static/bundle.js -v
-610598 bytes written to static/bundle.js
-610606 bytes written to static/bundle.js
-610597 bytes written to static/bundle.js
-610606 bytes written to static/bundle.js
-610597 bytes written to static/bundle.js
-610597 bytes written to static/bundle.js
+610598 bytes written to static/bundle.js  0.23s
+610606 bytes written to static/bundle.js  0.10s
+610597 bytes written to static/bundle.js  0.14s
+610606 bytes written to static/bundle.js  0.08s
+610597 bytes written to static/bundle.js  0.08s
+610597 bytes written to static/bundle.js  0.19s
 ```
+
+
 
 # usage
 

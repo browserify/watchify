@@ -6,7 +6,7 @@ var fs = require('fs');
 var path = require('path');
 var fromArgs = require('browserify/bin/args');
 
-var w, outfile, verbose, dotfile, delta, out;
+var w, outfile, verbose, dotfile;
 var prevErrs = [], first = true;
 
 function showError (err) {
@@ -57,10 +57,10 @@ function bundle () {
         fs.rename(dotfile, outfile, function (err) {
             if (err) return console.error(err);
             if (verbose) {
-                delta = (new Date()).getTime() - start;
-                delta = (delta / 1000.0).toFixed(2) + 's';
-                out = bytes + ' bytes written to ' + outfile + '  ' + delta;
-                console.error(out);
+                var delta = (new Date()).getTime() - start;
+                console.log(bytes + ' bytes written to ' + outfile
+                    + ' (' + (delta / 1000).toFixed(2) + ' seconds)'
+                );
             }
         });
     }

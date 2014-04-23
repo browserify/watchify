@@ -18,7 +18,7 @@ mkdirp.sync(tmpdir);
 fs.writeFileSync(files.main, 'console.log(555)');
 
 test('bin with standalone', function (t) {
-    t.plan(5);
+    t.plan(4);
     var ps = spawn(cmd, [ files.main, '-o', files.bundle, '-v', '-s', 'XXX' ]);
     var lineNum = 0;
     ps.stderr.pipe(split()).on('data', function (line) {
@@ -37,9 +37,6 @@ test('bin with standalone', function (t) {
                 ps.kill();
             });
         }
-    });
-    ps.on('exit', function (code) {
-        t.equal(lineNum, 3);
     });
 });
 

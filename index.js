@@ -33,24 +33,33 @@ function watchify (opts) {
     
     b.on('dep', function (dep) {
         cache[dep.id] = dep;
+        watchFile(dep.id, dep.id);
     });
 
     var fwatchers = {};
     var fwatcherFiles = {};
     b.on('bundle', function (bundle) {
         bundle.on('transform', function (tr, mfile) {
-            if (!fwatchers[mfile]) fwatchers[mfile] = [];
-            if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
-
-            watchFile(mfile, mfile);
-
             tr.on('file', function (file) {
-                watchFile(mfile, file);
+                watchDepFile(mfile, file);
             });
         });
     });
 
-    function watchFile(mfile, file) {
+    function watchFile (file) {
+        if (fwatchers[file]) return;
+        if (!fwatchers[file]) fwatchers[file] = [];
+        if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
+        
+        var w = chokidar.watch(file, {persistent: true});
+        w.on('error', b.emit.bind(b, 'error'));
+        w.on('change', function () {
+            invalidate(file);
+        });
+        fwatchers[file].push(w);
+    }
+    
+    function watchDepFile(mfile, file) {
         if (!fwatchers[mfile]) return;
         if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
 

@@ -33,6 +33,7 @@ function watchify (opts) {
     
     b.on('dep', function (dep) {
         cache[dep.id] = dep;
+        watchFile(dep.id, dep.id);
     });
     
     b.on('file', function (file) {

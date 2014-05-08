@@ -51,9 +51,9 @@ function watchify (opts) {
     });
 
     function watchFile (file) {
-        if (fwatchers[file]) return;
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
+        if (fwatcherFiles[file].indexOf(file) >= 0) return;
         
         var w = chokidar.watch(file, {persistent: true});
         w.on('error', b.emit.bind(b, 'error'));
@@ -61,10 +61,12 @@ function watchify (opts) {
             invalidate(file);
         });
         fwatchers[file].push(w);
+        fwatcherFiles[file].push(file);
     }
     
     function watchDepFile(mfile, file) {
-        if (!fwatchers[mfile]) return;
+        if (!fwatchers[mfile]) fwatchers[mfile] = [];
+        if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
         if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
 
         var w = chokidar.watch(file, {persistent: true});

@@ -5,7 +5,7 @@
   "main": "index.js",
   "bin": "bin/cmd.js",
   "dependencies": {
-    "browserify": ">=3.21.1 <4.0.0",
+    "browserify": "4.x",
     "optimist": "~0.5.0",
     "shallow-copy": "0.0.1",
     "through": "~2.3.4",

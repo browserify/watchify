@@ -31,8 +31,6 @@ $ watchify browser.js -d -o static/bundle.js -v
 610597 bytes written to static/bundle.js  0.19s
 ```
 
-
-
 # usage
 
 All the bundle options are the same as the browserify command except for `-v`.
@@ -61,6 +59,25 @@ Close all the open watch handles.
 ## w.on('update', function (ids) {})
 
 When the bundle changes, emit the array of bundle `ids` that changed.
+
+## w.on('bytes', function (bytes) {})
+
+When a bundle is generated, this event fires with the number of bytes.
+
+## w.on('time', function (time) {})
+
+When a bundle is generated, this event fires with the time it took to create the
+bundle in milliseconds.
+
+## w.on('log', function (msg) {})
+
+This event fires to with messages of the form:
+
+```
+X bytes written (Y seconds)
+```
+
+with the number of bytes in the bundle X and the time in seconds Y.
 
 # install
 

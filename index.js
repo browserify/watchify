@@ -49,7 +49,7 @@ function watchify (opts) {
             });
         });
     });
-
+    
     function watchFile (file) {
         if (fwatchers[file]) return;
         if (!fwatchers[file]) fwatchers[file] = [];
@@ -133,9 +133,19 @@ function watchify (opts) {
                 })();
             }
         });
+        
+        var start = Date.now();
+        var bytes = 0;
+        outStream.pipe(through(function (buf) { bytes += buf.length }));
         outStream.on('end', end);
+        
         function end () {
             first = false;
+            
+            var delta = ((Date.now() - start) / 1000).toFixed(2);
+            b.emit('log', bytes + ' bytes written (' + delta + ' seconds)');
+            b.emit('time', Date.now() - start);
+            b.emit('bytes', bytes);
         }
         return outStream;
     };

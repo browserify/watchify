@@ -37,7 +37,6 @@ function showError (err) {
 })();
 
 function bundle () {
-    var start = (new Date()).getTime();
     var wb = w.bundle();
     var caught = false;
     wb.on('error', function (err) {
@@ -45,11 +44,11 @@ function bundle () {
         caught = true;
     });
     wb.pipe(fs.createWriteStream(dotfile));
-    var bytes = 0;
-    wb.pipe(through(write, end));
+    var bytes, time;
+    w.on('bytes', function (b) { bytes = b });
+    w.on('time', function (t) { time = t });
     
-    function write (buf) { bytes += buf.length }
-    function end () {
+    wb.on('end', function () {
         prevErr = [];
         first = false;
         if (caught) return;
@@ -57,11 +56,10 @@ function bundle () {
         fs.rename(dotfile, outfile, function (err) {
             if (err) return console.error(err);
             if (verbose) {
-                var delta = (new Date()).getTime() - start;
                 console.error(bytes + ' bytes written to ' + outfile
-                    + ' (' + (delta / 1000).toFixed(2) + ' seconds)'
+                    + ' (' + (time / 1000).toFixed(2) + ' seconds)'
                 );
             }
         });
-    }
+    });
 }

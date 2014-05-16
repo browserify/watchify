@@ -7,9 +7,9 @@ var chokidar = require('chokidar');
 module.exports = watchify;
 watchify.browserify = browserify;
 
-function watchify (opts) {
+function watchify (files, opts) {
     if (!opts) opts = {};
-    var b = typeof opts.bundle === 'function' ? opts : browserify(opts);
+    var b = typeof files.bundle === 'function' ? files : browserify(files, opts);
     var cache = {};
     var pkgcache = {};
     var pending = false;

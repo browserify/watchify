@@ -11,7 +11,7 @@ var prevErrs = [], first = true;
 
 function showError (err) {
     if (prevErrs.indexOf(String(err)) < 0) {
-        console.error(err + '');
+        console.error(err + '\u0007');
         prevErrs.push(String(err));
     }
 }

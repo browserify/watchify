@@ -57,8 +57,6 @@ fs.writeFileSync(files.lines, 'beep\nboop');
 test('many immediate', function (t) {
     t.plan(expected.length * 2 + edits.length);
     var ps = spawn(cmd, [ files.main, '-t', 'brfs', '-o', files.bundle, '-v' ]);
-    ps.stdout.pipe(process.stdout);
-    ps.stderr.pipe(process.stdout);
     var lineNum = 0;
     ps.stderr.pipe(split()).on('data', function (line) {
         if (line.length === 0) return;

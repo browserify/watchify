@@ -9,7 +9,8 @@
     "optimist": "~0.5.0",
     "shallow-copy": "0.0.1",
     "through": "~2.3.4",
-    "chokidar": "^0.8.1"
+    "chokidar": "^0.8.1",
+    "minimatch": "~0.3.0"
   },
   "scripts": {
     "test": "tape test/*.js"

@@ -3,6 +3,7 @@ var copy = require('shallow-copy');
 var browserify = require('browserify');
 var fs = require('fs');
 var chokidar = require('chokidar');
+var minimatch = require('minimatch');
 
 module.exports = watchify;
 watchify.browserify = browserify;
@@ -21,6 +22,13 @@ function watchify (files, opts) {
     var pending = false;
     var changingDeps = {};
     var first = true;
+
+    var ignore = [].concat(opts.ignoreWatch || []);
+    for (var i = 0; i < ignore.length; i++) {
+        if (typeof ignore[i] === "string") {
+            ignore[i] = minimatch.makeRe("**/" +ignore[i]);
+        }
+    }
     
     if (opts.cache) {
         cache = opts.cache;
@@ -38,11 +46,13 @@ function watchify (files, opts) {
     });
     
     b.on('dep', function (dep) {
+        if (shouldIgnore(dep.id)) return;
         cache[dep.id] = dep;
-        watchFile(dep.id, dep.id);
+        watchFile(dep.id);
     });
     
     b.on('file', function (file) {
+        if (shouldIgnore(file)) return;
         watchFile(file);
     });
 
@@ -103,6 +113,15 @@ function watchify (files, opts) {
         
         }, opts.delay || 600);
         pending = true;
+    }
+
+    function shouldIgnore (file) {
+        for (var i = 0; i < ignore.length; i++) {
+            if (file.match(ignore[i])) {
+                return true;
+            }
+        }
+        return false;
     }
     
     var bundle = b.bundle.bind(b);

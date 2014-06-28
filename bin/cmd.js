@@ -9,6 +9,11 @@ var fromArgs = require('browserify/bin/args');
 var w, outfile, verbose, dotfile;
 var prevErrs = [], first = true;
 
+var alias = {
+    'ignore-watch': 'ignoreWatch',
+    'delay': 'delay' // to forward delay var to watchify 
+};
+
 function showError (err) {
     if (prevErrs.indexOf(String(err)) < 0) {
         console.error(err + '');
@@ -17,7 +22,11 @@ function showError (err) {
 }
 
 (function retry () {
-    w = watchify(fromArgs(process.argv.slice(2)));
+    var opts = fromArgs(process.argv.slice(2));
+    Object.keys(opts.argv).forEach(function(key) {
+        if (alias[key]) opts[alias[key]] = opts.argv[key];
+    });
+    w = watchify(opts);
     outfile = w.argv.o || w.argv.outfile;
     verbose = w.argv.v || w.argv.verbose;
     

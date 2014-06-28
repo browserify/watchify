@@ -1,10 +1,10 @@
 # watchify
 
-watch mode for browserify builds
+Watch mode for browserify builds
 
 [![build status](https://secure.travis-ci.org/substack/watchify.png)](http://travis-ci.org/substack/watchify)
 
-Update any source file and your browserify bundle will be recompiled on the
+Update any source file and your browserify bundle will be incrementally recompiled on the
 spot.
 
 # example
@@ -33,7 +33,26 @@ $ watchify browser.js -d -o static/bundle.js -v
 
 # usage
 
-All the bundle options are the same as the browserify command except for `-v`.
+Watchify supports all the same options as the browserify command with the following additions:
+
+```
+  --ignore-watch=GLOB  
+
+  Don't attach file watchers to the following glob. 
+  Useful for e.g. ignoring `node_modules` (`--ignore-watch=node_modules/**`)
+  
+  --delay=ms           [default: 600]
+
+  The number of ms to wait before emitting an 'update' event on a file change.
+  Set lower to get more immediate updates at the risk of causing multiple bundle changes per save.
+  It's usually not worth =changing this.
+
+  --verbose, -v
+
+  Verbose mode. Will print to stderr on a rebuild.
+```
+
+The above options (excepting `verbose`) exist as options to the `watchify()` constructor in camelCase.
 
 # methods
 

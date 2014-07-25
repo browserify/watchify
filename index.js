@@ -1,5 +1,6 @@
 var through = require('through2');
 var fs = require('fs');
+var path = require('path');
 var chokidar = require('chokidar');
 
 module.exports = function (b, opts) {
@@ -13,8 +14,13 @@ module.exports = function (b, opts) {
         cache[dep.id] = dep;
         if (dep.file) watchFile(dep.file);
     });
+    
     b.on('file', function (file) {
         watchFile(file);
+    });
+    
+    b.on('package', function (pkg) {
+        watchFile(path.join(pkg.__dirname, 'package.json'));
     });
     
     b.on('reset', reset);

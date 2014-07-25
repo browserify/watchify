@@ -22,7 +22,7 @@ bundle();
 function bundle () {
     var wb = w.bundle();
     wb.on('error', function (err) {
-        console.error(Date.now(), err.stack || err);
+        console.error(String(err));
     });
     wb.pipe(fs.createWriteStream(dotfile));
     

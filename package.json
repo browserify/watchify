@@ -1,6 +1,6 @@
 {
   "name": "watchify",
-  "version": "1.0.0",
+  "version": "0.10.2",
   "description": "watch mode for browserify builds",
   "main": "index.js",
   "bin": "bin/cmd.js",
@@ -35,6 +35,6 @@
     "name": "James Halliday",
     "email": "mail@substack.net",
     "url": "http://substack.net"
-  }
-  "license": "MIT",
+  },
+  "license": "MIT"
 }

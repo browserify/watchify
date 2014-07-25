@@ -9,7 +9,7 @@ var mkdirp = require('mkdirp');
 var through = require('through');
 
 var os = require('os');
-var tmpdir = path.join((os.tmpdir || os.tmpDir)(), 'watchify-' + Math.random());
+var tmpdir = path.join(__dirname, 'tmp', Math.random() + '');
 
 var main = path.join(tmpdir, 'main.js');
 var file = path.join(tmpdir, 'dep.jsnum');

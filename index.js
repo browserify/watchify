@@ -44,8 +44,12 @@ module.exports = function (b, opts) {
             next();
         }
         function end () {
-            b.emit('time', Date.now() - time);
+            var delta = Date.now() - time;
+            b.emit('time', delta);
             b.emit('bytes', bytes);
+            b.emit('log', bytes + ' bytes written ('
+                + (time / 1000).toFixed(2) + ' seconds)'
+            );
             this.push(null);
         }
     }

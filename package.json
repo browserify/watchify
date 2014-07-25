@@ -6,10 +6,11 @@
   "bin": "bin/cmd.js",
   "dependencies": {
     "browserify": "4.x",
+    "chokidar": "^0.8.1",
     "optimist": "~0.5.0",
     "shallow-copy": "0.0.1",
     "through": "~2.3.4",
-    "chokidar": "^0.8.1"
+    "through2": "^0.5.1"
   },
   "scripts": {
     "test": "tape test/*.js"

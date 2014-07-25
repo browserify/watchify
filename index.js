@@ -48,11 +48,10 @@ module.exports = function (b, opts) {
     
     var fwatchers = {};
     var fwatcherFiles = {};
-    b.on('bundle', function (bundle) {
-        bundle.on('transform', function (tr, mfile) {
-            tr.on('file', function (file) {
-                watchDepFile(mfile, file);
-            });
+    
+    b.on('transform', function (tr, mfile) {
+        tr.on('file', function (file) {
+            watchDepFile(mfile, file);
         });
     });
     

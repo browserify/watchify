@@ -5,14 +5,18 @@ var chokidar = require('chokidar');
 
 module.exports = function (b, opts) {
     if (!opts) opts = {};
-    var cache = opts.cache || {};
-    var pkgcache = opts.pkgcache || {};
+    var cache = b._options.cache;
+    var pkgcache = b._options.packageCache;
     var changingDeps = {};
     var pending = false;
     
     b.on('dep', function (dep) {
-        cache[dep.id] = dep;
-        if (dep.file) watchFile(dep.file);
+        if (typeof dep.id === 'string') {
+            cache[dep.id] = dep;
+        }
+        if (typeof dep.file === 'string') {
+            watchFile(dep.file);
+        }
     });
     
     b.on('file', function (file) {

@@ -6,8 +6,6 @@
   "bin": "bin/cmd.js",
   "dependencies": {
     "browserify": "4.x",
-    "optimist": "~0.5.0",
-    "shallow-copy": "0.0.1",
     "through": "~2.3.4",
     "chokidar": "^0.8.1"
   },

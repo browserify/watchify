@@ -3,7 +3,12 @@ var fs = require('fs');
 var path = require('path');
 var chokidar = require('chokidar');
 
-module.exports = function (b, opts) {
+module.exports = watchify;
+module.exports.args = {
+    cache: {}, packageCache: {}, fullPaths: true
+};
+
+function watchify (b, opts) {
     if (!opts) opts = {};
     var cache = b._options.cache;
     var pkgcache = b._options.packageCache;

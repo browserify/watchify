@@ -4,10 +4,8 @@ var watchify = require('../');
 var fs = require('fs');
 var path = require('path');
 
-var fromArgs = require('browserify/bin/args');
-var w = watchify(fromArgs(process.argv.slice(2), {
-    cache: {}, packageCache: {}, fullPaths: true
-}));
+var fromArgs = require('./args.js');
+var w = fromArgs(process.argv.slice(2));
 
 var outfile = w.argv.o || w.argv.outfile;
 var verbose = w.argv.v || w.argv.verbose;

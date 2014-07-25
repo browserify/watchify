@@ -27,8 +27,8 @@ function bundle () {
     wb.pipe(fs.createWriteStream(dotfile));
     
     var bytes, time;
-    wb.on('bytes', function (b) { bytes = b });
-    wb.on('time', function (t) { time = t });
+    w.on('bytes', function (b) { bytes = b });
+    w.on('time', function (t) { time = t });
     
     wb.on('end', function () {
         fs.rename(dotfile, outfile, function (err) {

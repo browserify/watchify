@@ -1,5 +1,4 @@
 var through = require('through');
-var copy = require('shallow-copy');
 var browserify = require('browserify');
 var fs = require('fs');
 var chokidar = require('chokidar');

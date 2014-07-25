@@ -35,7 +35,6 @@ test('api', function (t) {
             });
         }, 1000);
     });
-    t.on('end', function () { setTimeout(process.exit, 1000) });
 });
 
 function run (src) {

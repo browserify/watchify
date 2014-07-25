@@ -6,7 +6,7 @@ var vm = require('vm');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
-var through = require('through');
+var through = require('through2');
 
 var os = require('os');
 var tmpdir = path.join(__dirname, 'tmp', Math.random() + '');
@@ -22,12 +22,13 @@ function someTransform(file) {
     if (!/\.jsnum$/.test(file)) {
         return through();
     }
-    function write(chunk) {
+    function write (chunk, enc, next) {
         if (/\d/.test(chunk)) {
-            this.queue(chunk);
+            this.push(chunk);
         } else {
             this.emit('error', new Error('No number in this chunk'));
         }
+        next();
     }
     return through(write);
 }
@@ -49,7 +50,7 @@ test('errors in transform', function (t) {
         w.once('update', function () {
             w.bundle(function (err, src) {
                 t.ok(err instanceof Error, 'should be error');
-                t.equal(err.message, 'No number in this chunk');
+                t.ok(/^No number in this chunk/.test(err.message));
                 fixTheBuild();
             });
         });

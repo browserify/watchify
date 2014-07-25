@@ -34,7 +34,7 @@ function someTransform(file) {
 
 test('errors in transform', function (t) {
     t.plan(6);
-    var b = browserify(main);
+    var b = browserify(main, watchify.args);
     b.transform(someTransform);
     var w = watchify(b);
     w.bundle(function (err, src) {

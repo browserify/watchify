@@ -53,7 +53,7 @@ function watchify (b, opts) {
             b.emit('time', delta);
             b.emit('bytes', bytes);
             b.emit('log', bytes + ' bytes written ('
-                + (time / 1000).toFixed(2) + ' seconds)'
+                + (delta / 1000).toFixed(2) + ' seconds)'
             );
             this.push(null);
         }

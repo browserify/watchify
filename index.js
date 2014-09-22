@@ -69,6 +69,7 @@ function watchify (b, opts) {
     });
     
     function watchFile (file) {
+        if (fs.lstatSync (file).isDirectory ()) return;
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;

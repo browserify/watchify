@@ -25,7 +25,11 @@ fs.writeFileSync(files.lines, 'beep\nboop');
 
 test('bin brfs', function (t) {
     t.plan(4);
-    var ps = spawn(cmd, [ files.main, '-t', 'brfs', '-o', files.bundle, '-v' ]);
+    var ps = spawn(cmd, [
+        files.main,
+        '-t', require.resolve('brfs'), '-v',
+        '-o', files.bundle
+    ]);
     var lineNum = 0;
     ps.stderr.pipe(split()).on('data', function (line) {
         lineNum ++;

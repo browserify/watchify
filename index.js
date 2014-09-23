@@ -68,8 +68,14 @@ function watchify (b, opts) {
         });
     });
     
+    function watchFile_ (file) {
+        fs.lstat(file, function (err, stat) {
+            if (err || stat.isDirectory()) return;
+            watchFile(file);
+        });
+    }
+    
     function watchFile (file) {
-        if (fs.lstatSync (file).isDirectory ()) return;
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;

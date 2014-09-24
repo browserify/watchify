@@ -104,7 +104,7 @@ function watchify (b, opts) {
     }
     
     function invalidate (id) {
-        delete cache[id];
+        if (cache) delete cache[id];
         if (fwatchers[id]) {
             fwatchers[id].forEach(function (w) {
                 w.close();

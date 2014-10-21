@@ -23,7 +23,7 @@ bundle();
 function bundle () {
     var wb = w.bundle();
     wb.on('error', function (err) {
-        console.error(String(err));
+        console.error(String(err) + '\u0007');
         fs.writeFile(outfile, 'console.error('+JSON.stringify(String(err))+')', function(err) {
             if (err) console.error(err);
         })

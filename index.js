@@ -1,62 +1,81 @@
-var through = require('through');
-var copy = require('shallow-copy');
-var browserify = require('browserify');
+var through = require('through2');
 var fs = require('fs');
+var path = require('path');
 var chokidar = require('chokidar');
 
 module.exports = watchify;
-watchify.browserify = browserify;
+module.exports.args = {
+    cache: {}, packageCache: {}, fullPaths: true
+};
 
-function watchify (files, opts) {
-    var b;
-    if (!opts) {
-        opts = files || {};
-        files = undefined;
-        b = typeof opts.bundle === 'function' ? opts : browserify(opts);
-    } else {
-        b = typeof files.bundle === 'function' ? files : browserify(files, opts);
-    }
-    var cache = {};
-    var pkgcache = {};
-    var pending = false;
+function watchify (b, opts) {
+    if (!opts) opts = {};
+    var cache = b._options.cache;
+    var pkgcache = b._options.packageCache;
     var changingDeps = {};
-    var first = true;
-    
-    if (opts.cache) {
-        cache = opts.cache;
-        delete opts.cache;
-        first = false;
-    }
-    
-    if (opts.pkgcache) {
-        pkgcache = opts.pkgcache;
-        delete opts.pkgcache;
-    }
-    
-    b.on('package', function (file, pkg) {
-        pkgcache[file] = pkg;
-    });
+    var pending = false;
     
     b.on('dep', function (dep) {
-        cache[dep.id] = dep;
-        watchFile(dep.id, dep.id);
+        if (typeof dep.id === 'string') {
+            cache[dep.id] = dep;
+        }
+        if (typeof dep.file === 'string') {
+            watchFile(dep.file);
+        }
     });
     
     b.on('file', function (file) {
         watchFile(file);
     });
-
+    
+    b.on('package', function (pkg) {
+        watchFile(path.join(pkg.__dirname, 'package.json'));
+    });
+    
+    b.on('reset', reset);
+    reset();
+    
+    function reset () {
+        var time = null;
+        var bytes = 0;
+        b.pipeline.get('record').on('end', function () {
+            time = Date.now();
+        });
+        
+        b.pipeline.get('wrap').push(through(write, end));
+        function write (buf, enc, next) {
+            bytes += buf.length;
+            this.push(buf);
+            next();
+        }
+        function end () {
+            var delta = Date.now() - time;
+            b.emit('time', delta);
+            b.emit('bytes', bytes);
+            b.emit('log', bytes + ' bytes written ('
+                + (delta / 1000).toFixed(2) + ' seconds)'
+            );
+            this.push(null);
+        }
+    }
+    
     var fwatchers = {};
     var fwatcherFiles = {};
-    b.on('bundle', function (bundle) {
-        bundle.on('transform', function (tr, mfile) {
-            tr.on('file', function (file) {
-                watchDepFile(mfile, file);
-            });
+    
+    b.on('transform', function (tr, mfile) {
+        tr.on('file', function (file) {
+            watchDepFile(mfile, file);
         });
     });
     
     function watchFile (file) {
+        fs.lstat(file, function (err, stat) {
+            if (err || stat.isDirectory()) return;
+            watchFile_(file);
+        });
+    }
+    
+    function watchFile_ (file) {
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
@@ -85,7 +104,7 @@ function watchify (files, opts) {
     }
     
     function invalidate (id) {
-        delete cache[id];
+        if (cache) delete cache[id];
         if (fwatchers[id]) {
             fwatchers[id].forEach(function (w) {
                 w.close();
@@ -105,57 +124,10 @@ function watchify (files, opts) {
         pending = true;
     }
     
-    var bundle = b.bundle.bind(b);
     b.close = function () {
         Object.keys(fwatchers).forEach(function (id) {
             fwatchers[id].forEach(function (w) { w.close() });
         });
-    };
-    
-    b.bundle = function (opts_, cb) {
-        if (b._pending) return bundle(opts_, cb);
-        
-        if (typeof opts_ === 'function') {
-            cb = opts_;
-            opts_ = {};
-        }
-        if (!opts_) opts_ = {};
-        if (!first) opts_.cache = cache;
-        opts_.includePackage = true;
-        opts_.packageCache = pkgcache;
-        
-        // we only want to mess with the listeners if the bundle was created
-        // successfully, e.g. on the 'end' event.
-        var outStream = bundle(opts_, cb);
-        outStream.on('error', function (err) {
-            var updated = false;
-            b.once('update', function () { updated = true });
-            
-            if (err.type === 'not found') {
-                (function f () {
-                    if (updated) return;
-                    fs.exists(err.filename, function (ex) {
-                        if (ex) b.emit('update', [ err.filename ])
-                        else setTimeout(f, opts.delay || 600)
-                    });
-                })();
-            }
-        });
-        
-        var start = Date.now();
-        var bytes = 0;
-        outStream.pipe(through(function (buf) { bytes += buf.length }));
-        outStream.on('end', end);
-        
-        function end () {
-            first = false;
-            
-            var delta = ((Date.now() - start) / 1000).toFixed(2);
-            b.emit('log', bytes + ' bytes written (' + delta + ' seconds)');
-            b.emit('time', Date.now() - start);
-            b.emit('bytes', bytes);
-        }
-        return outStream;
     };
     
     return b;

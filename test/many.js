@@ -56,7 +56,11 @@ fs.writeFileSync(files.lines, 'beep\nboop');
 
 test('many edits', function (t) {
     t.plan(expected.length * 2 + edits.length);
-    var ps = spawn(cmd, [ files.main, '-t', 'brfs', '-o', files.bundle, '-v' ]);
+    var ps = spawn(cmd, [
+        files.main,
+        '-t', require.resolve('brfs'), '-v',
+        '-o', files.bundle
+    ]);
     ps.stdout.pipe(process.stdout);
     ps.stderr.pipe(process.stdout);
     var lineNum = 0;

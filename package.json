@@ -1,15 +1,19 @@
 {
   "name": "watchify",
-  "version": "0.10.2",
+  "version": "2.0.0",
   "description": "watch mode for browserify builds",
   "main": "index.js",
   "bin": "bin/cmd.js",
   "dependencies": {
-    "browserify": "4.x",
-    "optimist": "~0.5.0",
-    "shallow-copy": "0.0.1",
-    "through": "~2.3.4",
-    "chokidar": "^0.8.1"
+    "browserify": "^5.5.0",
+    "chokidar": "~0.8.2",
+    "through2": "~0.5.1"
+  },
+  "devDependencies": {
+    "brfs": "^1.0.1",
+    "mkdirp": "~0.3.5",
+    "split": "~0.3.0",
+    "tape": "^2.12.3"
   },
   "scripts": {
     "test": "tape test/*.js"
@@ -32,11 +36,5 @@
     "email": "mail@substack.net",
     "url": "http://substack.net"
   },
-  "license": "MIT",
-  "devDependencies": {
-    "brfs": "^1.0.1",
-    "mkdirp": "^0.3.5",
-    "split": "^0.3.0",
-    "tape": "^2.12.3"
-  }
+  "license": "MIT"
 }

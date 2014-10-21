@@ -38,12 +38,27 @@ All the bundle options are the same as the browserify command except for `-v`.
 # methods
 
 ``` js
-var watchify = require('watchify')
+var watchify = require('watchify');
+var fromArgs = require('watchify/bin/args');
 ```
 
-## var w = watchify(opts)
+## var w = watchify(b, opts)
 
-Create a browserify bundle `w` from `opts`.
+Wrap a browserify bundle `b` with watchify, returning the wrapped bundle
+instance as `w`.
+
+When creating the browserify instance `b` you MUST set these properties in the
+constructor:
+
+``` js
+var b = browserify({ cache: {}, packageCache: {}, fullPaths: true })
+```
+
+You can also just do:
+
+``` js
+var b = browserify(watchify.args)
+```
 
 `w` is exactly like a browserify bundle except that caches file contents and
 emits an `'update'` event when a file changes. You should call `w.bundle()`
@@ -53,6 +68,11 @@ extra times past the first time will be much faster due to caching.
 ## w.close()
 
 Close all the open watch handles.
+
+## var w = fromArgs(args)
+
+Create a watchify instance `w` from an array of arguments `args`. The required
+constructor parameters will be set up automatically.
 
 # events
 

@@ -81,6 +81,7 @@ function watchify (b, opts) {
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
         
         var w = chokidar.watch(file, {persistent: true});
+        w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
             invalidate(file);
@@ -95,6 +96,7 @@ function watchify (b, opts) {
         if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
 
         var w = chokidar.watch(file, {persistent: true});
+        w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
             invalidate(mfile);

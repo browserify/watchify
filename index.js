@@ -75,34 +75,30 @@ function watchify (b, opts) {
         });
     }
     
-    function watchFile_ (file) {
-        if (!fwatchers[file]) fwatchers[file] = [];
-        if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
-        if (fwatcherFiles[file].indexOf(file) >= 0) return;
-        
+    function makeWatcher (file, mfile) {
+        var key = mfile || file;
         var w = chokidar.watch(file, {persistent: true});
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
-            invalidate(file);
+            invalidate(key);
         });
-        fwatchers[file].push(w);
-        fwatcherFiles[file].push(file);
+        fwatchers[key].push(w);
+        fwatcherFiles[key].push(file);
+    }
+    
+    function watchFile_ (file) {
+        if (!fwatchers[file]) fwatchers[file] = [];
+        if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
+        if (fwatcherFiles[file].indexOf(file) >= 0) return;
+        makeWatcher(file);
     }
     
     function watchDepFile(mfile, file) {
         if (!fwatchers[mfile]) fwatchers[mfile] = [];
         if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
         if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
-
-        var w = chokidar.watch(file, {persistent: true});
-        w.setMaxListeners(0);
-        w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
-            invalidate(mfile);
-        });
-        fwatchers[mfile].push(w);
-        fwatcherFiles[mfile].push(file);
+        makeWatcher(file, mfile);
     }
     
     function invalidate (id) {

@@ -88,17 +88,34 @@ function watchify (b, opts) {
     }
     
     function watchFile_ (file) {
-        if (!fwatchers[file]) fwatchers[file] = [];
-        if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
-        if (fwatcherFiles[file].indexOf(file) >= 0) return;
-        makeWatcher(file);
+        fs.realpath(file, function(err, realPath) {
+          if (err) return;
+          if (realPath.split(path.sep)[1] != 'private') {
+            file = realPath;
+          }
+          if (!fwatchers[file]) fwatchers[file] = [];
+          if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
+          if (fwatcherFiles[file].indexOf(file) >= 0) return;
+          makeWatcher(file);
+        });
     }
     
     function watchDepFile(mfile, file) {
-        if (!fwatchers[mfile]) fwatchers[mfile] = [];
-        if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
-        if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
-        makeWatcher(file, mfile);
+      fs.realpath(file, function(err, realPath) {
+        if (err) return;
+        if (realPath.split(path.sep)[1] != 'private') {
+          file = fs.realpathSync(file);
+        }
+        fs.realpath(mfile, function (err, realPathM) {
+          if (realPathM.split(path.sep)[1] != 'private') {
+            mfile = fs.realpathSync(mfile);
+          }
+          if (!fwatchers[mfile]) fwatchers[mfile] = [];
+          if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
+          if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
+          makeWatcher(file, mfile);
+        })
+      });
     }
     
     function invalidate (id) {

@@ -75,34 +75,42 @@ function watchify (b, opts) {
         });
     }
     
+    function makeWatcher (file, mfile) {
+        var key = mfile || file;
+        var w = chokidar.watch(file, {persistent: true});
+        w.setMaxListeners(0);
+        w.on('error', b.emit.bind(b, 'error'));
+        w.on('change', function () {
+            invalidate(key);
+        });
+        fwatchers[key].push(w);
+        fwatcherFiles[key].push(file);
+    }
+    
     function watchFile_ (file) {
+        var realPath = fs.realpathSync(file);
+        if(realPath.split(path.sep)[1] != 'private') {
+          file = realPath;
+        }
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
-        
-        var w = chokidar.watch(file, {persistent: true});
-        w.setMaxListeners(0);
-        w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
-            invalidate(file);
-        });
-        fwatchers[file].push(w);
-        fwatcherFiles[file].push(file);
+        makeWatcher(file);
     }
     
     function watchDepFile(mfile, file) {
+      var realPath = fs.realpathSync(file);
+      var realPathM = fs.realpathSync(mfile);
+        if(realPath.split(path.sep)[1] != 'private') {
+          file = fs.realpathSync(file);
+        }
+        if(realPathM.split(path.sep)[1] != 'private') {
+          mfile = fs.realpathSync(mfile);
+        }
         if (!fwatchers[mfile]) fwatchers[mfile] = [];
         if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
         if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
-
-        var w = chokidar.watch(file, {persistent: true});
-        w.setMaxListeners(0);
-        w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
-            invalidate(mfile);
-        });
-        fwatchers[mfile].push(w);
-        fwatcherFiles[mfile].push(file);
+        makeWatcher(file, mfile);
     }
     
     function invalidate (id) {

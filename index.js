@@ -88,6 +88,10 @@ function watchify (b, opts) {
     }
     
     function watchFile_ (file) {
+        var realPath = fs.realpathSync(file);
+        if(realPath.split(path.sep)[1] != 'private') {
+          file = realPath;
+        }
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
@@ -95,6 +99,14 @@ function watchify (b, opts) {
     }
     
     function watchDepFile(mfile, file) {
+      var realPath = fs.realpathSync(file);
+      var realPathM = fs.realpathSync(mfile);
+        if(realPath.split(path.sep)[1] != 'private') {
+          file = fs.realpathSync(file);
+        }
+        if(realPathM.split(path.sep)[1] != 'private') {
+          mfile = fs.realpathSync(mfile);
+        }
         if (!fwatchers[mfile]) fwatchers[mfile] = [];
         if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
         if (fwatcherFiles[mfile].indexOf(file) >= 0) return;

@@ -5,7 +5,7 @@
   "main": "index.js",
   "bin": "bin/cmd.js",
   "dependencies": {
-    "browserify": "^6.1.0",
+    "browserify": "^7.0.0",
     "chokidar": "^0.10.2",
     "through2": "~0.5.1"
   },

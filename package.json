@@ -5,8 +5,8 @@
   "main": "index.js",
   "bin": "bin/cmd.js",
   "dependencies": {
-    "browserify": "^6.1.0",
-    "chokidar": "^0.10.2",
+    "browserify": "^7.0.0",
+    "chokidar": "~0.12.1",
     "through2": "~0.5.1"
   },
   "devDependencies": {

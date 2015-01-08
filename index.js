@@ -10,6 +10,9 @@ module.exports.args = {
 
 function watchify (b, opts) {
     if (!opts) opts = {};
+    if (!opts.chokidar) opts.chokidar = {};
+    if (!opts.chokidar.persistent) opts.chokidar.persistent = true;
+
     var cache = b._options.cache;
     var pkgcache = b._options.packageCache;
     var changingDeps = {};
@@ -80,7 +83,7 @@ function watchify (b, opts) {
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
         
-        var w = chokidar.watch(file, {persistent: true});
+        var w = chokidar.watch(file, opts.chokidar);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
@@ -95,7 +98,7 @@ function watchify (b, opts) {
         if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
         if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
 
-        var w = chokidar.watch(file, {persistent: true});
+        var w = chokidar.watch(file, opts.chokidar);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {

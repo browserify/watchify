@@ -37,7 +37,7 @@ function bundle () {
         fs.rename(dotfile, outfile, function (err) {
             if (err) return console.error(err);
             if (verbose) {
-                console.log(bytes + ' bytes written to ' + outfile
+                console.error(bytes + ' bytes written to ' + outfile
                     + ' (' + (time / 1000).toFixed(2) + ' seconds)'
                 );
             }

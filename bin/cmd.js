@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-var watchify = require('../');
 var fs = require('fs');
 var path = require('path');
 
@@ -38,7 +37,7 @@ function bundle () {
         fs.rename(dotfile, outfile, function (err) {
             if (err) return console.error(err);
             if (verbose) {
-                console.error(bytes + ' bytes written to ' + outfile
+                console.log(bytes + ' bytes written to ' + outfile
                     + ' (' + (time / 1000).toFixed(2) + ' seconds)'
                 );
             }

@@ -11,7 +11,9 @@ module.exports.args = {
 function watchify (b, opts) {
     if (!opts) opts = {};
     if (!opts.chokidar) opts.chokidar = {};
-    if (!opts.chokidar.persistent) opts.chokidar.persistent = true;
+    if (opts.chokidar.persistent === null || opts.chokidar.persistent === undefined) {
+        opts.chokidar.persistent = true;
+    }
 
     var cache = b._options.cache;
     var pkgcache = b._options.packageCache;

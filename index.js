@@ -14,6 +14,11 @@ function watchify (b, opts) {
     var pkgcache = b._options.packageCache;
     var changingDeps = {};
     var pending = false;
+    var delay = typeof opts.delay === 'number' ? opts.delay : 600;
+    var chokidarOpts = {
+        persistent: true,
+        usePolling: opts.poll
+    };
     
     b.on('dep', function (dep) {
         if (typeof dep.id === 'string') {
@@ -80,7 +85,7 @@ function watchify (b, opts) {
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
         
-        var w = chokidar.watch(file, {persistent: true});
+        var w = chokidar.watch(file, chokidarOpts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
@@ -95,7 +100,7 @@ function watchify (b, opts) {
         if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
         if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
 
-        var w = chokidar.watch(file, {persistent: true});
+        var w = chokidar.watch(file, chokidarOpts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
@@ -122,7 +127,7 @@ function watchify (b, opts) {
             b.emit('update', Object.keys(changingDeps));
             changingDeps = {};
         
-        }, opts.delay || 600);
+        }, delay);
         pending = true;
     }
     

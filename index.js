@@ -15,6 +15,10 @@ function watchify (b, opts) {
     var changingDeps = {};
     var pending = false;
     
+    b.isPending = function () {
+        return pending;
+    }
+    
     b.on('dep', function (dep) {
         if (typeof dep.id === 'string') {
             cache[dep.id] = dep;

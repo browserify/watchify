@@ -13,6 +13,7 @@ function watchify (b, opts) {
     var cache = b._options.cache;
     var pkgcache = b._options.packageCache;
     var changingDeps = {};
+    var objectMode = opts.objectMode || false;
     var pending = false;
     
     b.on('dep', function (dep) {
@@ -42,7 +43,7 @@ function watchify (b, opts) {
             time = Date.now();
         });
         
-        b.pipeline.get('wrap').push(through(write, end));
+        b.pipeline.get('wrap').push(through({ objectMode: objectMode }, write, end));
         function write (buf, enc, next) {
             bytes += buf.length;
             this.push(buf);

@@ -34,14 +34,23 @@ function bundle () {
     w.on('bytes', function (b) { bytes = b });
     w.on('time', function (t) { time = t });
     
-    wb.on('end', function () {
+    wb.on('end', rename.bind(null, 0));
+    
+    function rename(retryCount) {
+        if (!retryCount || typeof retryCount !== 'number') retryCount = 0;
         fs.rename(dotfile, outfile, function (err) {
-            if (err) return console.error(err);
-            if (verbose) {
+            if (err) {
+                if (retryCount < 3) {
+                    console.error('retrying');
+                    setTimeout(rename, 100, retryCount+1);
+                }
+                else console.error(err);
+            }
+            else if (verbose) {
                 console.error(bytes + ' bytes written to ' + outfile
                     + ' (' + (time / 1000).toFixed(2) + ' seconds)'
                 );
             }
         });
-    });
+    }
 }

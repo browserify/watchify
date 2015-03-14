@@ -5,13 +5,13 @@ var chokidar = require('chokidar');
 
 module.exports = watchify;
 module.exports.args = {
-    cache: {}, packageCache: {}, fullPaths: true
+    _cache: {}, _packageCache: {}, fullPaths: true
 };
 
 function watchify (b, opts) {
     if (!opts) opts = {};
-    var cache = b._options.cache;
-    var pkgcache = b._options.packageCache;
+    var cache = b._options._cache;
+    var pkgcache = b._options._packageCache;
     var changingDeps = {};
     var pending = false;
     

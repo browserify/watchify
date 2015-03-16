@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-var watchify = require('../');
 var fs = require('fs');
 var path = require('path');
 
@@ -24,33 +23,40 @@ function bundle () {
     var wb = w.bundle();
     wb.on('error', function (err) {
         console.error(String(err));
-        fs.writeFile(outfile, 'console.error('+JSON.stringify(String(err))+')', function(err) {
-            if (err) console.error(err);
-        })
+        fs.writeFile(outfile, 'console.error('+JSON.stringify(String(err))+')', logIfErr)
     });
-    wb.pipe(fs.createWriteStream(dotfile));
+    wb.pipe(fs.createWriteStream(dotfile)).on('error', logIfErr);
     
     var bytes, time;
     w.on('bytes', function (b) { bytes = b });
     w.on('time', function (t) { time = t });
-    
-    wb.on('end', rename.bind(null, 0));
-    
-    function rename(retryCount) {
-        if (!retryCount || typeof retryCount !== 'number') retryCount = 0;
-        fs.rename(dotfile, outfile, function (err) {
-            if (err) {
-                if (retryCount < 3) {
-                    console.error('retrying');
-                    setTimeout(rename, 100, retryCount+1);
-                }
-                else console.error(err);
-            }
-            else if (verbose) {
-                console.error(bytes + ' bytes written to ' + outfile
-                    + ' (' + (time / 1000).toFixed(2) + ' seconds)'
-                );
-            }
-        });
+    function verboseLog() {
+        console.error(bytes + ' bytes written to ' + outfile
+            + ' (' + (time / 1000).toFixed(2) + ' seconds)'
+        );
     }
+    
+    wb.on('end', function () {
+        fs.rename(dotfile, outfile, function (err) {
+            if (err && err.code === 'EPERM') fakeRename();
+            else if (err) console.error(err);
+            else if (verbose) verboseLog();
+        });
+    });
+    function fakeRename() {
+        fs.createReadStream(dotfile)
+            .pipe(fs.createWriteStream(outfile))
+            .on('finish', function () {
+                fs.unlink(dotfile, function (err) {
+                    if (err) console.error(err);
+                    else if (verbose) verboseLog();
+                })
+            })
+            .on('error', logIfErr)
+        ;
+    }
+}
+
+function logIfErr(err) {
+    if (err) console.error(String(err))
 }

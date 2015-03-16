@@ -23,10 +23,10 @@ function bundle () {
     var wb = w.bundle();
     wb.on('error', function (err) {
         console.error(String(err));
-        fs.writeFile(outfile, 'console.error('+JSON.stringify(String(err))+')', logIfErr)
+        fs.writeFile(outfile, 'console.error('+JSON.stringify(String(err))+')', logIfErr);
     });
     wb.pipe(fs.createWriteStream(dotfile)).on('error', logIfErr);
-    
+
     var bytes, time;
     w.on('bytes', function (b) { bytes = b });
     w.on('time', function (t) { time = t });
@@ -58,5 +58,5 @@ function bundle () {
 }
 
 function logIfErr(err) {
-    if (err) console.error(String(err))
+    if (err) console.error(String(err));
 }

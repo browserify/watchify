@@ -1,11 +1,11 @@
 var through = require('through2');
-var fs = require('fs');
 var path = require('path');
 var chokidar = require('chokidar');
+var xtend = require('xtend');
 
 module.exports = watchify;
 module.exports.args = {
-    cache: {}, packageCache: {}, fullPaths: true
+    cache: {}, packageCache: {}
 };
 
 function watchify (b, opts) {
@@ -15,14 +15,24 @@ function watchify (b, opts) {
     var changingDeps = {};
     var pending = false;
     
-    b.on('dep', function (dep) {
-        if (typeof dep.id === 'string') {
-            cache[dep.id] = dep;
-        }
-        if (typeof dep.file === 'string') {
-            watchFile(dep.file);
-        }
-    });
+    b.on('reset', collect);
+    collect();
+    
+    function collect () {
+        b.pipeline.get('deps').push(through.obj(function(row, enc, next) {
+            if (cache) {
+                cache[row.file] = {
+                    id: row.file,
+                    source: row.source,
+                    deps: xtend({}, row.deps),
+                    file: row.file
+                };
+            }
+            watchFile(row.file);
+            this.push(row);
+            next();
+        }));
+    }
     
     b.on('file', function (file) {
         watchFile(file);
@@ -69,13 +79,6 @@ function watchify (b, opts) {
     });
     
     function watchFile (file) {
-        fs.lstat(file, function (err, stat) {
-            if (err || stat.isDirectory()) return;
-            watchFile_(file);
-        });
-    }
-    
-    function watchFile_ (file) {
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;

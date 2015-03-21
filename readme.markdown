@@ -51,7 +51,7 @@ When creating the browserify instance `b` you MUST set these properties in the
 constructor:
 
 ``` js
-var b = browserify({ cache: {}, packageCache: {}, fullPaths: true })
+var b = browserify({ cache: {}, packageCache: {} })
 ```
 
 You can also just do:

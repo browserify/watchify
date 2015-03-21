@@ -29,20 +29,17 @@ function bundle () {
         })
     });
     wb.pipe(concat(function (buf) {
-		fs.writeFile(outfile, buf, function (err) {
-			if (err) console.error(String(err));
-		})
-	}));
+        fs.writeFile(outfile, buf, function (err) {
+            if (err) return console.error(String(err));
+            if (verbose) {
+                console.error(bytes + ' bytes written to ' + outfile
+                    + ' (' + (time / 1000).toFixed(2) + ' seconds)'
+                );
+            }
+        });
+    }));
     
     var bytes, time;
     w.on('bytes', function (b) { bytes = b });
     w.on('time', function (t) { time = t });
-    
-    wb.on('end', function () {
-		if (verbose) {
-			console.error(bytes + ' bytes written to ' + outfile
-				+ ' (' + (time / 1000).toFixed(2) + ' seconds)'
-			);
-		}
-    });
 }

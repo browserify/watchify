@@ -7,6 +7,7 @@
   "dependencies": {
     "browserify": "^9.0.2",
     "chokidar": "~0.12.1",
+	"concat-stream": "^1.4.7",
     "through2": "~0.5.1"
   },
   "devDependencies": {

@@ -3,7 +3,7 @@ var watchify = require('../');
 
 module.exports = function (args) {
     return watchify(fromArgs(
-        process.argv.slice(2),
+        args || process.argv.slice(2),
         watchify.args
     ));
 };

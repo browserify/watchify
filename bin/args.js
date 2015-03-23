@@ -2,8 +2,9 @@ var fromArgs = require('browserify/bin/args');
 var watchify = require('../');
 
 module.exports = function (args) {
-    return watchify(fromArgs(
+    var browserify = fromArgs(
         args || process.argv.slice(2),
         watchify.args
-    ));
+    );
+    return watchify(browserify, browserify.argv);
 };

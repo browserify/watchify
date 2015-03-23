@@ -15,7 +15,6 @@ if (!outfile) {
     console.error('You MUST specify an outfile with -o.');
     process.exit(1);
 }
-var dotfile = path.join(path.dirname(outfile), '.' + path.basename(outfile));
 
 w.on('update', bundle);
 bundle();
@@ -28,20 +27,17 @@ function bundle () {
             if (err) console.error(err);
         })
     });
-    wb.pipe(fs.createWriteStream(dotfile));
+    wb.pipe(fs.createWriteStream(outfile));
     
     var bytes, time;
     w.on('bytes', function (b) { bytes = b });
     w.on('time', function (t) { time = t });
     
     wb.on('end', function () {
-        fs.rename(dotfile, outfile, function (err) {
-            if (err) return console.error(err);
-            if (verbose) {
-                console.error(bytes + ' bytes written to ' + outfile
-                    + ' (' + (time / 1000).toFixed(2) + ' seconds)'
-                );
-            }
-        });
+        if (verbose) {
+            console.error(bytes + ' bytes written to ' + outfile
+                + ' (' + (time / 1000).toFixed(2) + ' seconds)'
+            );
+        }
     });
 }

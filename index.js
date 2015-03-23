@@ -12,6 +12,7 @@ function watchify (b, opts) {
     if (!opts) opts = {};
     var cache = b._options.cache;
     var pkgcache = b._options.packageCache;
+    var delay = typeof opts.delay === 'number' ? opts.delay : 600;
     var changingDeps = {};
     var pending = false;
     
@@ -125,7 +126,7 @@ function watchify (b, opts) {
             b.emit('update', Object.keys(changingDeps));
             changingDeps = {};
         
-        }, opts.delay || 600);
+        }, delay);
         pending = true;
     }
     

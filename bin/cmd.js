@@ -6,6 +6,7 @@ var path = require('path');
 
 var fromArgs = require('./args.js');
 var w = fromArgs(process.argv.slice(2));
+var usingWindows = (process.platform === 'win32');
 w.setMaxListeners(Infinity);
 
 var outfile = w.argv.o || w.argv.outfile;
@@ -28,20 +29,25 @@ function bundle () {
             if (err) console.error(err);
         })
     });
-    wb.pipe(fs.createWriteStream(dotfile));
+    wb.pipe(fs.createWriteStream(usingWindows ? outfile : dotfile));
     
     var bytes, time;
     w.on('bytes', function (b) { bytes = b });
     w.on('time', function (t) { time = t });
     
     wb.on('end', function () {
+        if (usingWindows) return logVerboseEnd();
         fs.rename(dotfile, outfile, function (err) {
             if (err) return console.error(err);
-            if (verbose) {
-                console.error(bytes + ' bytes written to ' + outfile
-                    + ' (' + (time / 1000).toFixed(2) + ' seconds)'
-                );
-            }
+            logVerboseEnd();
         });
     });
+    
+    function logVerboseEnd () {
+        if (verbose) {
+            console.error(bytes + ' bytes written to ' + outfile
+                + ' (' + (time / 1000).toFixed(2) + ' seconds)'
+            );
+        }
+    }
 }

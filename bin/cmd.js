@@ -6,7 +6,6 @@ var path = require('path');
 
 var fromArgs = require('./args.js');
 var w = fromArgs(process.argv.slice(2));
-w.setMaxListeners(Infinity);
 
 var outfile = w.argv.o || w.argv.outfile;
 var verbose = w.argv.v || w.argv.verbose;
@@ -16,6 +15,10 @@ if (!outfile) {
     process.exit(1);
 }
 var dotfile = path.join(path.dirname(outfile), '.' + path.basename(outfile));
+
+var bytes, time;
+w.on('bytes', function (b) { bytes = b });
+w.on('time', function (t) { time = t });
 
 w.on('update', bundle);
 bundle();
@@ -29,10 +32,6 @@ function bundle () {
         })
     });
     wb.pipe(fs.createWriteStream(dotfile));
-    
-    var bytes, time;
-    w.on('bytes', function (b) { bytes = b });
-    w.on('time', function (t) { time = t });
     
     wb.on('end', function () {
         fs.rename(dotfile, outfile, function (err) {

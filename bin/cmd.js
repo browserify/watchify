@@ -24,19 +24,24 @@ w.on('update', bundle);
 bundle();
 
 function bundle () {
+    var didError = false;
+    var dotStream = fs.createWriteStream(dotfile);
+
     var wb = w.bundle();
     wb.on('error', function (err) {
         console.error(String(err));
-        fs.writeFile(outfile, 'console.error('+JSON.stringify(String(err))+')', function(err) {
-            if (err) console.error(err);
-        })
+        didError = true;
+        dotStream.end('console.error('+JSON.stringify(String(err))+');');
     });
-    wb.pipe(fs.createWriteStream(dotfile));
-    
-    wb.on('end', function () {
+    wb.pipe(dotStream);
+
+    dotStream.on('error', function (err) {
+        console.error(err);
+    });
+    dotStream.on('close', function () {
         fs.rename(dotfile, outfile, function (err) {
             if (err) return console.error(err);
-            if (verbose) {
+            if (verbose && !didError) {
                 console.error(bytes + ' bytes written to ' + outfile
                     + ' (' + (time / 1000).toFixed(2) + ' seconds)'
                 );

@@ -6,7 +6,7 @@
   "bin": "bin/cmd.js",
   "dependencies": {
     "browserify": "^9.0.2",
-    "chokidar": "~0.12.1",
+    "chokidar": "^1.0.0-rc4",
     "through2": "~0.6.3",
     "xtend": "^4.0.0"
   },

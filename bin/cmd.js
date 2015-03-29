@@ -3,6 +3,7 @@
 var watchify = require('../');
 var fs = require('fs');
 var path = require('path');
+var os = require('os');
 
 var fromArgs = require('./args.js');
 var w = fromArgs(process.argv.slice(2));
@@ -14,7 +15,9 @@ if (!outfile) {
     console.error('You MUST specify an outfile with -o.');
     process.exit(1);
 }
-var dotfile = path.join(path.dirname(outfile), '.' + path.basename(outfile));
+
+var tmpname = 'watchify-' + Math.random() + '-' + path.basename(outfile);
+var tmpfile = path.join((os.tmpdir || os.tmpDir)(), tmpname);
 
 var bytes, time;
 w.on('bytes', function (b) { bytes = b });
@@ -25,21 +28,21 @@ bundle();
 
 function bundle () {
     var didError = false;
-    var dotStream = fs.createWriteStream(dotfile);
+    var tmpStream = fs.createWriteStream(tmpfile);
 
     var wb = w.bundle();
     wb.on('error', function (err) {
         console.error(String(err));
         didError = true;
-        dotStream.end('console.error('+JSON.stringify(String(err))+');');
+        tmpStream.end('console.error('+JSON.stringify(String(err))+');');
     });
-    wb.pipe(dotStream);
+    wb.pipe(tmpStream);
 
-    dotStream.on('error', function (err) {
+    tmpStream.on('error', function (err) {
         console.error(err);
     });
-    dotStream.on('close', function () {
-        fs.rename(dotfile, outfile, function (err) {
+    tmpStream.on('close', function () {
+        fs.rename(tmpfile, outfile, function (err) {
             if (err) return console.error(err);
             if (verbose && !didError) {
                 console.error(bytes + ' bytes written to ' + outfile

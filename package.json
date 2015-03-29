@@ -7,6 +7,7 @@
   "dependencies": {
     "browserify": "^9.0.2",
     "chokidar": "^1.0.0-rc4",
+    "defined": "~0.0.0",
     "through2": "~0.6.3",
     "xtend": "^4.0.0"
   },

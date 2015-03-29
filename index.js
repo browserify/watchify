@@ -16,6 +16,19 @@ function watchify (b, opts) {
     var changingDeps = {};
     var pending = false;
     
+    var wopts = {persistent: true};
+    if (opts.ignoreWatch) {
+        wopts.ignored = opts.ignoreWatch !== true
+            ? opts.ignoreWatch
+            : '**/node_modules/**';
+    }
+    if (opts.poll) {
+        wopts.usePolling = true;
+        wopts.interval = opts.poll !== true
+            ? opts.poll
+            : undefined;
+    }
+
     b.on('reset', collect);
     collect();
     
@@ -84,7 +97,7 @@ function watchify (b, opts) {
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
         
-        var w = chokidar.watch(file, {persistent: true});
+        var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
@@ -99,7 +112,7 @@ function watchify (b, opts) {
         if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
         if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
 
-        var w = chokidar.watch(file, {persistent: true});
+        var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
@@ -136,5 +149,9 @@ function watchify (b, opts) {
         });
     };
     
+    b._watcher = function (file, opts) {
+        return chokidar.watch(file, opts);
+    };
+
     return b;
 }

@@ -42,13 +42,19 @@ function bundle () {
         console.error(err);
     });
     tmpStream.on('close', function () {
-        fs.rename(tmpfile, outfile, function (err) {
+        fs.readFile(tmpfile, function (err, data) {
             if (err) return console.error(err);
-            if (verbose && !didError) {
-                console.error(bytes + ' bytes written to ' + outfile
-                    + ' (' + (time / 1000).toFixed(2) + ' seconds)'
-                );
-            }
+
+            fs.writeFile(outfile, data, function (err) {
+                if (err) return console.error(err);
+                if (verbose && !didError) {
+                    console.error(bytes + ' bytes written to ' + outfile
+                        + ' (' + (time / 1000).toFixed(2) + ' seconds)'
+                    );
+                }
+
+                fs.unlinkSync(tmpfile);
+            })
         });
     });
 }

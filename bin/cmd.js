@@ -41,20 +41,24 @@ function bundle () {
     tmpStream.on('error', function (err) {
         console.error(err);
     });
+
     tmpStream.on('close', function () {
-        fs.readFile(tmpfile, function (err, data) {
-            if (err) return console.error(err);
+        var tmpReadStream = fs.createReadStream(tmpfile);
+        var outStream = fs.createWriteStream(outfile);
 
-            fs.writeFile(outfile, data, function (err) {
-                if (err) return console.error(err);
-                if (verbose && !didError) {
-                    console.error(bytes + ' bytes written to ' + outfile
-                        + ' (' + (time / 1000).toFixed(2) + ' seconds)'
-                    );
-                }
+        tmpReadStream.on('error', function (err) {
+            console.error(err);
+        });
 
-                fs.unlinkSync(tmpfile);
-            })
+        tmpReadStream.pipe(outStream);
+        tmpReadStream.on('end',function() {
+            if (verbose && !didError) {
+                console.error(bytes + ' bytes written to ' + outfile
+                    + ' (' + (time / 1000).toFixed(2) + ' seconds)'
+                );
+            }
+
+            fs.unlinkSync(tmpfile);
         });
     });
 }

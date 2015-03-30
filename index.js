@@ -22,7 +22,7 @@ function watchify (b, opts) {
             ? opts.ignoreWatch
             : '**/node_modules/**';
     }
-    if (opts.poll) {
+    if (opts.poll || typeof opts.poll === 'number') {
         wopts.usePolling = true;
         wopts.interval = opts.poll !== true
             ? opts.poll

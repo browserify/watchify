@@ -9,9 +9,6 @@ spot.
 
 # example
 
-Use `watchify` with all the same arguments as `browserify` except that
-`-o` is mandatory:
-
 ```
 $ watchify main.js -o static/bundle.js
 ```
@@ -23,17 +20,50 @@ You can use `-v` to get more verbose output to show when a file was written and 
 
 ```
 $ watchify browser.js -d -o static/bundle.js -v
-610598 bytes written to static/bundle.js  0.23s
-610606 bytes written to static/bundle.js  0.10s
-610597 bytes written to static/bundle.js  0.14s
-610606 bytes written to static/bundle.js  0.08s
-610597 bytes written to static/bundle.js  0.08s
-610597 bytes written to static/bundle.js  0.19s
+610598 bytes written to static/bundle.js (0.23 seconds)
+610606 bytes written to static/bundle.js (0.10 seconds)
+610597 bytes written to static/bundle.js (0.14 seconds)
+610606 bytes written to static/bundle.js (0.08 seconds)
+610597 bytes written to static/bundle.js (0.08 seconds)
+610597 bytes written to static/bundle.js (0.19 seconds)
 ```
 
 # usage
 
-All the bundle options are the same as the browserify command except for `-v`.
+Use `watchify` with all the same options as `browserify` except that `-o` (or
+`--outfile`) is mandatory. Additionally, there are also:
+
+```
+Standard Options:
+
+  --outfile=FILE, -o FILE
+
+    Write the browserify bundle to this file. This option is required.
+
+  --verbose, -v                     [default: false]
+
+    Show when a file was written and how long the bundling took (in
+    seconds).
+```
+
+```
+Advanced Options:
+
+  --delay                           [default: 600]
+
+    Amount of time in milliseconds to wait before emitting an "update"
+    event after a change.
+
+  --ignore-watch=GLOB, --iw GLOB    [default: false]
+
+    Ignore monitoring files for changes that match the pattern. Omitting
+    the pattern will default to "**/node_modules/**".
+
+  --poll=INTERVAL                   [default: false]
+
+    Use polling to monitor for changes. Omitting the interval will default
+    to 100ms. This option is useful if you're watching an NFS volume.
+```
 
 # methods
 
@@ -51,19 +81,35 @@ When creating the browserify instance `b` you MUST set these properties in the
 constructor:
 
 ``` js
-var b = browserify({ cache: {}, packageCache: {} })
+var b = browserify({ cache: {}, packageCache: {} });
+var w = watchify(b);
 ```
 
 You can also just do:
 
 ``` js
-var b = browserify(watchify.args)
+var b = browserify(watchify.args);
+var w = watchify(b);
 ```
 
 `w` is exactly like a browserify bundle except that caches file contents and
 emits an `'update'` event when a file changes. You should call `w.bundle()`
 after the `'update'` event fires to generate a new bundle. Calling `w.bundle()`
 extra times past the first time will be much faster due to caching.
+
+`opts.delay` is the amount of time in milliseconds to wait before emitting
+an "update" event after a change. Defaults to `600`.
+
+`opts.ignoreWatch` ignores monitoring files for changes. If set to `true`,
+then `**/node_modules/**` will be ignored. For other possible values see
+Chokidar's [documentation](https://github.com/paulmillr/chokidar#path-filtering) on "ignored".
+
+`opts.poll` enables polling to monitor for changes. If set to `true`, then
+a polling interval of 100ms is used. If set to a number, then that amount of
+milliseconds will be the polling interval. For more info see Chokidar's
+[documentation](https://github.com/paulmillr/chokidar#performance) on
+"usePolling" and "interval".
+_This option is useful if you're watching an NFS volume._
 
 ## w.close()
 

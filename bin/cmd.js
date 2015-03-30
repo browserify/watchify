@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var fs = require('fs');
+var outpipe = require('outpipe');
 
 var fromArgs = require('./args.js');
 var w = fromArgs(process.argv.slice(2));
@@ -22,7 +23,9 @@ bundle();
 
 function bundle () {
     var didError = false;
-    var outStream = fs.createWriteStream(outfile);
+    var outStream = process.platform === 'win32'
+        ? fs.createWriteStream(outfile)
+        : outpipe(outfile);
 
     var wb = w.bundle();
     wb.on('error', function (err) {

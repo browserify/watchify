@@ -1,9 +1,6 @@
 #!/usr/bin/env node
 
-var watchify = require('../');
 var fs = require('fs');
-var path = require('path');
-var os = require('os');
 
 var fromArgs = require('./args.js');
 var w = fromArgs(process.argv.slice(2));
@@ -16,9 +13,6 @@ if (!outfile) {
     process.exit(1);
 }
 
-var tmpname = 'watchify-' + Math.random() + '-' + path.basename(outfile);
-var tmpfile = path.join((os.tmpdir || os.tmpDir)(), tmpname);
-
 var bytes, time;
 w.on('bytes', function (b) { bytes = b });
 w.on('time', function (t) { time = t });
@@ -28,27 +22,24 @@ bundle();
 
 function bundle () {
     var didError = false;
-    var tmpStream = fs.createWriteStream(tmpfile);
+    var outStream = fs.createWriteStream(outfile);
 
     var wb = w.bundle();
     wb.on('error', function (err) {
         console.error(String(err));
         didError = true;
-        tmpStream.end('console.error('+JSON.stringify(String(err))+');');
+        outStream.end('console.error('+JSON.stringify(String(err))+');');
     });
-    wb.pipe(tmpStream);
+    wb.pipe(outStream);
 
-    tmpStream.on('error', function (err) {
+    outStream.on('error', function (err) {
         console.error(err);
     });
-    tmpStream.on('close', function () {
-        fs.rename(tmpfile, outfile, function (err) {
-            if (err) return console.error(err);
-            if (verbose && !didError) {
-                console.error(bytes + ' bytes written to ' + outfile
-                    + ' (' + (time / 1000).toFixed(2) + ' seconds)'
-                );
-            }
-        });
+    outStream.on('close', function () {
+        if (verbose && !didError) {
+            console.error(bytes + ' bytes written to ' + outfile
+                + ' (' + (time / 1000).toFixed(2) + ' seconds)'
+            );
+        }
     });
 }

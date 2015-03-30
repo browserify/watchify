@@ -15,7 +15,8 @@
     "brfs": "^1.0.1",
     "mkdirp": "~0.3.5",
     "split": "~0.3.0",
-    "tape": "^2.12.3"
+    "tape": "^2.12.3",
+    "win-spawn": "^2.0.0"
   },
   "scripts": {
     "test": "tape test/*.js"

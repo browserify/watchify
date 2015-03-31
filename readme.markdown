@@ -1,6 +1,6 @@
 # watchify
 
-watch mode for browserify builds
+watch mode for [browserify](https://github.com/substack/node-browserify) builds
 
 [![build status](https://secure.travis-ci.org/substack/watchify.png)](http://travis-ci.org/substack/watchify)
 
@@ -15,6 +15,17 @@ $ watchify main.js -o static/bundle.js
 
 Now as you update files, `static/bundle.js` will be automatically incrementally rebuilt on
 the fly.
+
+The `-o` option can be a file or a shell command (not available on Windows)
+that receives piped input:
+
+``` sh
+watchify main.js -o 'exorcist static/bundle.js.map > static/bundle.js' -d
+```
+
+``` sh
+watchify main.js -o 'uglifyjs -cm > static/bundle.min.js'
+```
 
 You can use `-v` to get more verbose output to show when a file was written and how long the bundling took (in seconds):
 
@@ -38,7 +49,10 @@ Standard Options:
 
   --outfile=FILE, -o FILE
 
-    Write the browserify bundle to this file. This option is required.
+    This option is required. Write the browserify bundle to this file. If
+    the file contains the operators `|` or `>`, it will be treated as a
+    shell command, and the output will be piped to it (not available on
+    Windows).
 
   --verbose, -v                     [default: false]
 

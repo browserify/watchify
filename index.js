@@ -106,7 +106,7 @@ function watchify (b, opts) {
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
 
         debug('watching %s file', file);
-        
+
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
@@ -122,6 +122,8 @@ function watchify (b, opts) {
         if (!fwatchers[mfile]) fwatchers[mfile] = [];
         if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
         if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
+
+        debug('watching %s Dep file', file);
 
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);

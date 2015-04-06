@@ -11,9 +11,9 @@ module.exports.args = {
 
 /**
  * Watchify
- * @param  {Object} b - browserify instance
+ * @param  {Browserify} b - browserify instance
  * @param  {Object} [opts]
- * @return {Object}
+ * @return {Browserify}
  */
 
 function watchify (b, opts) {
@@ -23,7 +23,7 @@ function watchify (b, opts) {
     var delay = typeof opts.delay === 'number' ? opts.delay : 600;
     var changingDeps = {};
     var pending = false;
-    
+
     var wopts = {persistent: true};
     if (opts.ignoreWatch) {
         wopts.ignored = opts.ignoreWatch !== true
@@ -39,7 +39,7 @@ function watchify (b, opts) {
 
     b.on('reset', collect);
     collect();
-    
+
     function collect () {
         b.pipeline.get('deps').push(through.obj(function(row, enc, next) {
             if (cache) {

@@ -101,7 +101,8 @@ function watchify (b, opts) {
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
+        w.on('change', function (f) {
+            debug('`%s` file changed', f);
             invalidate(file);
         });
         fwatchers[file].push(w);

@@ -2,6 +2,7 @@ var through = require('through2');
 var path = require('path');
 var chokidar = require('chokidar');
 var xtend = require('xtend');
+var debug = require('debug')('watchify');
 
 module.exports = watchify;
 module.exports.args = {

@@ -2,11 +2,19 @@ var through = require('through2');
 var path = require('path');
 var chokidar = require('chokidar');
 var xtend = require('xtend');
+var debug = require('debug')('watchify');
 
 module.exports = watchify;
 module.exports.args = {
     cache: {}, packageCache: {}
 };
+
+/**
+ * Watchify
+ * @param  {Browserify} b - browserify instance
+ * @param  {Object} [opts]
+ * @return {Browserify}
+ */
 
 function watchify (b, opts) {
     if (!opts) opts = {};
@@ -15,7 +23,7 @@ function watchify (b, opts) {
     var delay = typeof opts.delay === 'number' ? opts.delay : 600;
     var changingDeps = {};
     var pending = false;
-    
+
     var wopts = {persistent: true};
     if (opts.ignoreWatch) {
         wopts.ignored = opts.ignoreWatch !== true
@@ -31,7 +39,7 @@ function watchify (b, opts) {
 
     b.on('reset', collect);
     collect();
-    
+
     function collect () {
         b.pipeline.get('deps').push(through.obj(function(row, enc, next) {
             if (cache) {
@@ -96,11 +104,14 @@ function watchify (b, opts) {
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
-        
+
+        debug('watching %s file', file);
+
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
+        w.on('change', function (f) {
+            debug('`%s` file changed', f);
             invalidate(file);
         });
         fwatchers[file].push(w);
@@ -111,6 +122,8 @@ function watchify (b, opts) {
         if (!fwatchers[mfile]) fwatchers[mfile] = [];
         if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
         if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
+
+        debug('watching %s Dep file', file);
 
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);

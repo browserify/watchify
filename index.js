@@ -9,6 +9,13 @@ module.exports.args = {
     cache: {}, packageCache: {}
 };
 
+/**
+ * Watchify
+ * @param  {Object} b - browserify instance
+ * @param  {Object} [opts]
+ * @return {Object}
+ */
+
 function watchify (b, opts) {
     if (!opts) opts = {};
     var cache = b._options.cache;
@@ -97,6 +104,8 @@ function watchify (b, opts) {
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
+
+        debug('watching %s file', file);
         
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);

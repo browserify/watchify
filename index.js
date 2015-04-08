@@ -18,9 +18,16 @@ function watchify (b, opts) {
     
     var wopts = {persistent: true};
     if (opts.ignoreWatch) {
-        wopts.ignored = opts.ignoreWatch !== true
-            ? opts.ignoreWatch
-            : '**/node_modules/**';
+        wopts.ignored = true;
+        if (opts.ignoreWatch !== true) {
+            var ig = wopts.ignored = opts.ignoreWatch;
+            if (ig && '/' == ig[0] && '/' == ig[ig.length - 1]) {
+              ig = new RegExp(ig.substr(1, ig.length - 2));
+              wopts.ignored = ig;
+            }
+        } else {
+            wopts.ignored = '**/node_modules/**';
+        }
     }
     if (opts.poll || typeof opts.poll === 'number') {
         wopts.usePolling = true;
@@ -152,6 +159,9 @@ function watchify (b, opts) {
     b._watcher = function (file, opts) {
         return chokidar.watch(file, opts);
     };
+
+    function ignore_watch (file) {
+    }
 
     return b;
 }

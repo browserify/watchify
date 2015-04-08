@@ -3,6 +3,9 @@ var path = require('path');
 var chokidar = require('chokidar');
 var xtend = require('xtend');
 
+var debug = require('debug')('watchify');
+var debug_change = require('debug')('watchify:change');
+
 module.exports = watchify;
 module.exports.args = {
     cache: {}, packageCache: {}
@@ -107,11 +110,15 @@ function watchify (b, opts) {
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
 
+        debug(file);
+
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function (f) {
             if (ignore_watch(f)) return;
+
+            debug_change(f);
             invalidate(file);
         });
         fwatchers[file].push(w);
@@ -128,6 +135,8 @@ function watchify (b, opts) {
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function (f) {
             if (ignore_watch(f)) return;
+
+            debug_change(f);
             invalidate(mfile);
         });
         fwatchers[mfile].push(w);

@@ -49,7 +49,6 @@ function watchify (b, opts) {
                     file: row.file
                 };
             }
-
             watchFile(row.file);
             this.push(row);
             next();

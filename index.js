@@ -23,7 +23,7 @@ function watchify (b, opts) {
             var ig = wopts.ignored = opts.ignoreWatch;
             if (ig && '/' == ig[0] && '/' == ig[ig.length - 1]) {
               ig = new RegExp(ig.substr(1, ig.length - 2));
-              wopts.ignored = ig;
+              wopts.ignored = opts.ignoreWatch = ig;
             }
         } else {
             wopts.ignored = '**/node_modules/**';
@@ -49,6 +49,12 @@ function watchify (b, opts) {
                     file: row.file
                 };
             }
+
+            // ignore files
+            if ((opts.ignoreWatch).test(row.file)) {
+              return next();
+            }
+
             watchFile(row.file);
             this.push(row);
             next();
@@ -108,6 +114,7 @@ function watchify (b, opts) {
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
+            if ((opts.ignoreWatch).test(file)) return;
             invalidate(file);
         });
         fwatchers[file].push(w);
@@ -123,6 +130,7 @@ function watchify (b, opts) {
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
+            if ((opts.ignoreWatch).test(mfile)) return;
             invalidate(mfile);
         });
         fwatchers[mfile].push(w);

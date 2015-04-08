@@ -50,11 +50,6 @@ function watchify (b, opts) {
                 };
             }
 
-            // ignore files
-            if ((opts.ignoreWatch).test(row.file)) {
-              return next();
-            }
-
             watchFile(row.file);
             this.push(row);
             next();
@@ -106,15 +101,18 @@ function watchify (b, opts) {
     });
     
     function watchFile (file) {
+        // ignore files
+        if (ignore_watch()) return;
+
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
-        
+
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
-            if ((opts.ignoreWatch).test(file)) return;
+            if (ignore_watch()) return;
             invalidate(file);
         });
         fwatchers[file].push(w);
@@ -130,7 +128,7 @@ function watchify (b, opts) {
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
-            if ((opts.ignoreWatch).test(mfile)) return;
+            if (ignore_watch()) return;
             invalidate(mfile);
         });
         fwatchers[mfile].push(w);
@@ -169,6 +167,7 @@ function watchify (b, opts) {
     };
 
     function ignore_watch (file) {
+      return 'object' == typeof opts.ignoreWatch && (opts.ignoreWatch).test(file)
     }
 
     return b;

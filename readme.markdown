@@ -72,6 +72,8 @@ Advanced Options:
 
     Ignore monitoring files for changes that match the pattern. Omitting
     the pattern will default to "**/node_modules/**".
+    If it's wrapped in `/` chars then a RegExp will be created. For instance
+    "/\.js/".
 
   --poll=INTERVAL                   [default: false]
 

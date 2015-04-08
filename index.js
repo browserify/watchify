@@ -102,7 +102,7 @@ function watchify (b, opts) {
     
     function watchFile (file) {
         // ignore files
-        if (ignore_watch()) return;
+        if (ignore_watch(file)) return;
 
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
@@ -111,8 +111,8 @@ function watchify (b, opts) {
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
-            if (ignore_watch()) return;
+        w.on('change', function (f) {
+            if (ignore_watch(f)) return;
             invalidate(file);
         });
         fwatchers[file].push(w);
@@ -127,8 +127,8 @@ function watchify (b, opts) {
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
-            if (ignore_watch()) return;
+        w.on('change', function (f) {
+            if (ignore_watch(f)) return;
             invalidate(mfile);
         });
         fwatchers[mfile].push(w);
@@ -167,7 +167,7 @@ function watchify (b, opts) {
     };
 
     function ignore_watch (file) {
-      return 'object' == typeof opts.ignoreWatch && (opts.ignoreWatch).test(file)
+      return 'object' == typeof opts.ignoreWatch && (opts.ignoreWatch).test(file);
     }
 
     return b;

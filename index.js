@@ -2,6 +2,7 @@ var through = require('through2');
 var path = require('path');
 var chokidar = require('chokidar');
 var xtend = require('xtend');
+var anymatch = require('anymatch');
 
 var debug = require('debug')('watchify');
 var debug_change = require('debug')('watchify:change');
@@ -104,19 +105,19 @@ function watchify (b, opts) {
     
     function watchFile (file) {
         // ignore files
-        if (ignore_watch(file)) return;
+        if (anymatch(opts.ignoreWatch, file)) return;
 
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
 
-        debug(file);
+        debug('add %s', file);
 
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function (f) {
-            if (ignore_watch(f)) return;
+            if (anymatch(opts.ignoreWatch, f)) return;
 
             debug_change(f);
             invalidate(file);
@@ -134,7 +135,7 @@ function watchify (b, opts) {
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function (f) {
-            if (ignore_watch(f)) return;
+            if (anymatch(opts.ignoreWatch, f)) return;
 
             debug_change(f);
             invalidate(mfile);
@@ -173,10 +174,6 @@ function watchify (b, opts) {
     b._watcher = function (file, opts) {
         return chokidar.watch(file, opts);
     };
-
-    function ignore_watch (file) {
-      return 'object' == typeof opts.ignoreWatch && (opts.ignoreWatch).test(file);
-    }
 
     return b;
 }

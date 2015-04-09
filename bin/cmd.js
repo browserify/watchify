@@ -40,7 +40,7 @@ function bundle () {
     });
     outStream.on('close', function () {
         if (verbose && !didError) {
-            console.error(bytes + ' bytes written to ' + outfile
+            console.info(bytes + ' bytes written to ' + outfile
                 + ' (' + (time / 1000).toFixed(2) + ' seconds)'
             );
         }

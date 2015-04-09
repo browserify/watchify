@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 var fs = require('fs');
+var path = require('path');
 var outpipe = require('outpipe');
 
 var fromArgs = require('./args.js');
@@ -8,6 +9,16 @@ var w = fromArgs(process.argv.slice(2));
 
 var outfile = w.argv.o || w.argv.outfile;
 var verbose = w.argv.v || w.argv.verbose;
+
+if (w.argv.version) {
+    console.error('watchify v' + require('../package.json').version +
+        ' (in ' + path.resolve(__dirname, '..') + ')'
+    );
+    console.error('browserify v' + require('browserify/package.json').version +
+        ' (in ' + path.dirname(require.resolve('browserify')) + ')'
+    );
+    return;
+}
 
 if (!outfile) {
     console.error('You MUST specify an outfile with -o.');

@@ -58,6 +58,10 @@ Standard Options:
 
     Show when a file was written and how long the bundling took (in
     seconds).
+
+  --version
+
+    Show the watchify and browserify versions with their module paths.
 ```
 
 ```

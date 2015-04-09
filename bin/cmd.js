@@ -2,7 +2,6 @@
 
 var fs = require('fs');
 var outpipe = require('outpipe');
-var debug = require('debug')('watchify:cmd');
 
 var fromArgs = require('./args.js');
 var w = fromArgs(process.argv.slice(2));
@@ -41,7 +40,7 @@ function bundle () {
     });
     outStream.on('close', function () {
         if (verbose && !didError) {
-            debug(bytes + ' bytes written to ' + outfile
+            console.log(bytes + ' bytes written to ' + outfile
                 + ' (' + (time / 1000).toFixed(2) + ' seconds)'
             );
         }

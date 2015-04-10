@@ -93,7 +93,6 @@ function watchify (b, opts) {
     });
     
     function watchFile (file) {
-        if (b._mdeps.top.basedir === file) return;
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
@@ -102,6 +101,7 @@ function watchify (b, opts) {
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
+            if (b._mdeps.top.basedir === file) return;  
             invalidate(file);
         });
         fwatchers[file].push(w);

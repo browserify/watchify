@@ -111,8 +111,8 @@ function watchify (b, opts) {
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
-            if (anymatch(opts.ignoreWatch, file)) return;
+        w.on('change', function (f) {
+            if (anymatch(opts.ignoreWatch, f)) return;
             invalidate(file);
         });
         fwatchers[file].push(w);
@@ -127,8 +127,8 @@ function watchify (b, opts) {
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
-            if (anymatch(opts.ignoreWatch, mfile)) return;
+        w.on('change', function (f) {
+            if (anymatch(opts.ignoreWatch, f)) return;
             invalidate(mfile);
         });
         fwatchers[mfile].push(w);

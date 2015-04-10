@@ -15,8 +15,8 @@ if (!outfile) {
 }
 
 var bytes, time;
-w.on('bytes', function (b) { bytes = b; });
-w.on('time', function (t) { time = t; });
+w.on('bytes', function (b) { bytes = b });
+w.on('time', function (t) { time = t });
 
 w.on('update', bundle);
 bundle();
@@ -40,7 +40,7 @@ function bundle () {
     });
     outStream.on('close', function () {
         if (verbose && !didError) {
-            console.log(bytes + ' bytes written to ' + outfile
+            console.error(bytes + ' bytes written to ' + outfile
                 + ' (' + (time / 1000).toFixed(2) + ' seconds)'
             );
         }

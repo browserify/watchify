@@ -29,20 +29,18 @@ function watchify (b, opts) {
             : undefined;
     }
 
-    b.on('reset', collect);
-    collect();
+    if (cache) {
+        b.on('reset', collect);
+        collect();
+    }
     
     function collect () {
         b.pipeline.get('deps').push(through.obj(function(row, enc, next) {
-            if (cache) {
-                cache[row.file] = {
-                    id: row.file,
-                    source: row.source,
-                    deps: xtend({}, row.deps),
-                    file: row.file
-                };
-            }
-            watchFile(row.file);
+            var file = row.expose ? b._expose[row.id] : row.file;
+            cache[file] = {
+                source: row.source,
+                deps: xtend({}, row.deps)
+            };
             this.push(row);
             next();
         }));

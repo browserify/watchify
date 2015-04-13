@@ -94,6 +94,8 @@ function watchify (b, opts) {
     });
     
     function watchFile (file) {
+        if (anymatch(opts.ignoreWatch, file)) return false;
+
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;

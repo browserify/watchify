@@ -2,6 +2,7 @@ var through = require('through2');
 var path = require('path');
 var chokidar = require('chokidar');
 var xtend = require('xtend');
+var anymatch = require('anymatch');
 
 module.exports = watchify;
 module.exports.args = {
@@ -93,6 +94,8 @@ function watchify (b, opts) {
     });
     
     function watchFile (file) {
+        if (anymatch(opts.ignoreWatch, file)) return false;
+
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;

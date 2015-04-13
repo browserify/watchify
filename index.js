@@ -2,6 +2,7 @@ var through = require('through2');
 var path = require('path');
 var chokidar = require('chokidar');
 var xtend = require('xtend');
+var anymatch = require('anymatch');
 
 module.exports = watchify;
 module.exports.args = {
@@ -42,7 +43,7 @@ function watchify (b, opts) {
                     file: row.file
                 };
             }
-            watchFile(row.file);
+            if (!watchFile(row.file)) return next();
             this.push(row);
             next();
         }));
@@ -93,6 +94,9 @@ function watchify (b, opts) {
     });
     
     function watchFile (file) {
+        // ignore files
+        if (anymatch(opts.ignoreWatch, file)) return false;
+
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(file) >= 0) return;
@@ -100,7 +104,7 @@ function watchify (b, opts) {
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
+        w.on('change', function (f) {
             invalidate(file);
         });
         fwatchers[file].push(w);
@@ -115,7 +119,7 @@ function watchify (b, opts) {
         var w = b._watcher(file, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
+        w.on('change', function (f) {
             invalidate(mfile);
         });
         fwatchers[mfile].push(w);

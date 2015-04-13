@@ -19,16 +19,9 @@ function watchify (b, opts) {
     
     var wopts = {persistent: true};
     if (opts.ignoreWatch) {
-        wopts.ignored = true;
-        if (opts.ignoreWatch !== true) {
-            var ig = wopts.ignored = opts.ignoreWatch;
-            if (ig && '/' == ig[0] && '/' == ig[ig.length - 1]) {
-              ig = new RegExp(ig.substr(1, ig.length - 2));
-              wopts.ignored = opts.ignoreWatch = ig;
-            }
-        } else {
-            wopts.ignored = '**/node_modules/**';
-        }
+        wopts.ignored = opts.ignoreWatch !== true
+            ? opts.ignoreWatch
+            : '**/node_modules/**';
     }
     if (opts.poll || typeof opts.poll === 'number') {
         wopts.usePolling = true;

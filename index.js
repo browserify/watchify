@@ -50,7 +50,7 @@ function watchify (b, opts) {
                     file: row.file
                 };
             }
-            watchFile(row.file);
+            if (!watchFile(row.file)) return next();
             this.push(row);
             next();
         }));
@@ -102,7 +102,7 @@ function watchify (b, opts) {
     
     function watchFile (file) {
         // ignore files
-        if (anymatch(opts.ignoreWatch, file)) return;
+        if (anymatch(opts.ignoreWatch, file)) return false;
 
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
@@ -112,7 +112,6 @@ function watchify (b, opts) {
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function (f) {
-            if (anymatch(opts.ignoreWatch, f)) return;
             invalidate(file);
         });
         fwatchers[file].push(w);
@@ -128,7 +127,6 @@ function watchify (b, opts) {
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function (f) {
-            if (anymatch(opts.ignoreWatch, f)) return;
             invalidate(mfile);
         });
         fwatchers[mfile].push(w);

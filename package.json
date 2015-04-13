@@ -10,6 +10,7 @@
     "defined": "~0.0.0",
     "outpipe": "^1.1.0",
     "through2": "~0.6.3",
+    "anymatch": "1.2.1",
     "xtend": "^4.0.0"
   },
   "devDependencies": {

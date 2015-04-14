@@ -87,39 +87,25 @@ function watchify (b, opts) {
     var fwatcherFiles = {};
     
     b.on('transform', function (tr, mfile) {
-        tr.on('file', function (file) {
-            watchDepFile(mfile, file);
+        tr.on('file', function (dep) {
+            watchFile(mfile, dep);
         });
     });
-    
-    function watchFile (file) {
+
+    function watchFile (file, dep) {
+        dep = dep || file;
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
-        if (fwatcherFiles[file].indexOf(file) >= 0) return;
-        
-        var w = b._watcher(file, wopts);
+        if (fwatcherFiles[file].indexOf(dep) >= 0) return;
+
+        var w = b._watcher(dep, wopts);
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
             invalidate(file);
         });
         fwatchers[file].push(w);
-        fwatcherFiles[file].push(file);
-    }
-    
-    function watchDepFile(mfile, file) {
-        if (!fwatchers[mfile]) fwatchers[mfile] = [];
-        if (!fwatcherFiles[mfile]) fwatcherFiles[mfile] = [];
-        if (fwatcherFiles[mfile].indexOf(file) >= 0) return;
-
-        var w = b._watcher(file, wopts);
-        w.setMaxListeners(0);
-        w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
-            invalidate(mfile);
-        });
-        fwatchers[mfile].push(w);
-        fwatcherFiles[mfile].push(file);
+        fwatcherFiles[file].push(dep);
     }
     
     function invalidate (id) {

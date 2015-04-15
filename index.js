@@ -4,8 +4,8 @@ var chokidar = require('chokidar');
 var xtend = require('xtend');
 
 module.exports = watchify;
-module.exports.args = {
-    cache: {}, packageCache: {}
+module.exports.args = function () {
+    return {cache: {}, packageCache: {}};
 };
 
 function watchify (b, opts) {

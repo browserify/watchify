@@ -4,9 +4,11 @@ var chokidar = require('chokidar');
 var xtend = require('xtend');
 
 module.exports = watchify;
-module.exports.args = {
-    cache: {}, packageCache: {}
+module.exports.defaults = function (opts) {
+    return xtend({cache: {}, packageCache: {}}, opts);
 };
+// DEPRECATED - will be removed in a future version
+module.exports.args = watchify.defaults();
 
 function watchify (b, opts) {
     if (!opts) opts = {};

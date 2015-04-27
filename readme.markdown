@@ -118,9 +118,9 @@ extra times past the first time will be much faster due to caching.
 `opts.delay` is the amount of time in milliseconds to wait before emitting
 an "update" event after a change. Defaults to `600`.
 
-`opts.ignoreWatch` ignores monitoring files for changes. If set to `true`,
-then `**/node_modules/**` will be ignored. For other possible values see
-Chokidar's [documentation](https://github.com/paulmillr/chokidar#path-filtering) on "ignored".
+`opts.ignoreWatch` is a glob (or array of globs) that will be used to ignore
+files (i.e. not watch) for changes. If set to `true`, then `**/node_modules/**`
+will be ignored. Globs are parsed by [minimatch](https://github.com/isaacs/minimatch).
 
 `opts.poll` enables polling to monitor for changes. If set to `true`, then
 a polling interval of 100ms is used. If set to a number, then that amount of

@@ -179,12 +179,14 @@ $ npm install watchify
 
 to get just the library.
 
-# Common Problems
+# troubleshooting
 
-### No rebuilding on OS X
+## rebuilds on OS X never trigger
 
-If you don't get rebuilds on Mac OS X, try `--poll` flag or rename the project's directory.
-This is a bug related to `fsevents` on OS X, for more info check this  [comment and issue thread](https://github.com/substack/watchify/issues/205#issuecomment-98672850)
+It may be related to a bug in `fsevents` (see [#250](https://github.com/substack/watchify/issues/205#issuecomment-98672850)
+and [SO](http://stackoverflow.com/questions/26708205/webpack-watch-isnt-compiling-changed-files/28610124#28610124)).
+Try the `--poll` flag and/or renaming the project's directory - that might
+help.
 
 # license
 

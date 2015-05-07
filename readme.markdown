@@ -179,6 +179,13 @@ $ npm install watchify
 
 to get just the library.
 
+# Common Problems
+
+### No rebuilding on OS X
+
+If you don't get rebuilds on Mac OS X, try `--poll` flag or rename the project's directory.
+This is a bug related to `fsevents` on OS X, for more info check this  [comment and issue thread](https://github.com/substack/watchify/issues/205#issuecomment-98672850)
+
 # license
 
 MIT

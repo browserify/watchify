@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+var notifier = require('node-notifier');
 var fs = require('fs');
 var path = require('path');
 var outpipe = require('outpipe');
@@ -9,6 +10,7 @@ var w = fromArgs(process.argv.slice(2));
 
 var outfile = w.argv.o || w.argv.outfile;
 var verbose = w.argv.v || w.argv.verbose;
+var notify = w.argv.n || w.argv.notify;
 
 if (w.argv.version) {
     console.error('watchify v' + require('../package.json').version +
@@ -43,6 +45,13 @@ function bundle () {
         console.error(String(err));
         didError = true;
         outStream.end('console.error('+JSON.stringify(String(err))+');');
+
+        if (notify) {
+            notifier.notify({
+                'title': 'Watchify',
+                'message': JSON.stringify(String(err))
+            });
+        }
     });
     wb.pipe(outStream);
 
@@ -50,10 +59,18 @@ function bundle () {
         console.error(err);
     });
     outStream.on('close', function () {
+        var stats = bytes + ' bytes written to ' + outfile
+            + ' (' + (time / 1000).toFixed(2) + ' seconds)';
+
         if (verbose && !didError) {
-            console.error(bytes + ' bytes written to ' + outfile
-                + ' (' + (time / 1000).toFixed(2) + ' seconds)'
-            );
+            console.error(stats);
+        }
+
+        if (notify && !didError) {
+            notifier.notify({
+                'title': 'Watchify',
+                'message': stats
+            });
         }
     });
 }

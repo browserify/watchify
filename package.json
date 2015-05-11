@@ -8,6 +8,7 @@
     "browserify": "^10.0.0",
     "chokidar": "^1.0.0",
     "defined": "^1.0.0",
+    "node-notifier": "^4.2.1",
     "outpipe": "^1.1.0",
     "through2": "~0.6.3",
     "xtend": "^4.0.0"

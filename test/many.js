@@ -57,7 +57,7 @@ fs.writeFileSync(files.lines, 'beep\nboop');
 test('many edits', function (t) {
     t.plan(expected.length * 2 + edits.length);
     var ps = spawn(cmd, [
-        files.main,
+        files.main, '-n',
         '-t', require.resolve('brfs'), '-v',
         '-o', files.bundle
     ]);

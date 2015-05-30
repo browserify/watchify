@@ -110,6 +110,14 @@ var b = browserify(watchify.args);
 var w = watchify(b);
 ```
 
+Notice that you won't see any output from watchify on rebuild. To see it, you need to handle the `log` event. For example like so:
+
+```js
+w.on('log', function(data) {
+    console.log(data);
+});
+```
+
 `w` is exactly like a browserify bundle except that caches file contents and
 emits an `'update'` event when a file changes. You should call `w.bundle()`
 after the `'update'` event fires to generate a new bundle. Calling `w.bundle()`

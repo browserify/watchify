@@ -37,9 +37,14 @@ function watchify (b, opts) {
     function collect () {
         b.pipeline.get('deps').push(through.obj(function(row, enc, next) {
             var file = row.expose ? b._expose[row.id] : row.file;
+            var deps = xtend({}, row.deps);
+            Object.keys(deps).forEach(function(dep) {
+                // External dependency(doesn't have a file path).
+                if (deps[dep] == null) delete deps[dep];
+            });
             cache[file] = {
                 source: row.source,
-                deps: xtend({}, row.deps)
+                deps: deps
             };
             this.push(row);
             next();

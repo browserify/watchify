@@ -51,7 +51,9 @@ function watchify (b, opts) {
     });
     
     b.on('package', function (pkg) {
-        watchFile(path.join(pkg.__dirname, 'package.json'));
+        var file = path.join(pkg.__dirname, 'package.json');
+        watchFile(file);
+        if (pkgcache) pkgcache[file] = pkg;
     });
     
     b.on('reset', reset);
@@ -108,6 +110,7 @@ function watchify (b, opts) {
     
     function invalidate (id) {
         if (cache) delete cache[id];
+        if (pkgcache) delete pkgcache[id];
         if (fwatchers[id]) {
             fwatchers[id].forEach(function (w) {
                 w.close();
@@ -122,7 +125,6 @@ function watchify (b, opts) {
             pending = false;
             b.emit('update', Object.keys(changingDeps));
             changingDeps = {};
-        
         }, delay);
         pending = true;
     }

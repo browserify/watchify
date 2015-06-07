@@ -1,6 +1,7 @@
 var through = require('through2');
 var path = require('path');
 var chokidar = require('chokidar');
+var minimatch = require('minimatch');
 var xtend = require('xtend');
 
 module.exports = watchify;
@@ -17,16 +18,19 @@ function watchify (b, opts) {
     var pending = false;
     
     var wopts = {persistent: true};
-    if (opts.ignoreWatch) {
-        wopts.ignored = opts.ignoreWatch !== true
-            ? opts.ignoreWatch
-            : '**/node_modules/**';
-    }
     if (opts.poll || typeof opts.poll === 'number') {
         wopts.usePolling = true;
         wopts.interval = opts.poll !== true
             ? opts.poll
             : undefined;
+    }
+
+    if (opts.ignoreWatch) {
+        var ignorePatterns = [].concat(
+            opts.ignoreWatch !== true
+                ? opts.ignoreWatch
+                : '**/node_modules/**'
+        );
     }
 
     if (cache) {
@@ -39,7 +43,7 @@ function watchify (b, opts) {
             var file = row.expose ? b._expose[row.id] : row.file;
             cache[file] = {
                 source: row.source,
-                deps: xtend({}, row.deps)
+                deps: xtend(row.deps)
             };
             this.push(row);
             next();
@@ -85,6 +89,7 @@ function watchify (b, opts) {
     
     var fwatchers = {};
     var fwatcherFiles = {};
+    var fwatcherIgnores = {};
     
     b.on('transform', function (tr, mfile) {
         tr.on('file', function (dep) {
@@ -94,6 +99,7 @@ function watchify (b, opts) {
 
     function watchFile (file, dep) {
         dep = dep || file;
+        if (b._watcherIgnore(dep)) return;
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(dep) >= 0) return;
@@ -138,6 +144,16 @@ function watchify (b, opts) {
     b._watcher = function (file, opts) {
         return chokidar.watch(file, opts);
     };
+
+    b._watcherIgnore = function (file) {
+        if (!opts.ignoreWatch) return false;
+        if (!(file in fwatcherIgnores)) {
+            fwatcherIgnores[file] = ignorePatterns.some(function (pattern) {
+                return minimatch(file, pattern);
+            });
+        }
+        return fwatcherIgnores[file];
+    }
 
     return b;
 }

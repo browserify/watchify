@@ -4,7 +4,7 @@ var defined = require('defined');
 var xtend = require('xtend');
 
 module.exports = function (args) {
-    var b = fromArgs(args, watchify.args);
+    var b = fromArgs(args, watchify.defaults());
 
     var opts = {};
     var ignoreWatch = defined(b.argv['ignore-watch'], b.argv.iw);

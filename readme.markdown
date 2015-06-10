@@ -103,13 +103,6 @@ var b = browserify({ cache: {}, packageCache: {} });
 var w = watchify(b);
 ```
 
-You can also just do:
-
-``` js
-var b = browserify(watchify.args);
-var w = watchify(b);
-```
-
 `w` is exactly like a browserify bundle except that caches file contents and
 emits an `'update'` event when a file changes. You should call `w.bundle()`
 after the `'update'` event fires to generate a new bundle. Calling `w.bundle()`

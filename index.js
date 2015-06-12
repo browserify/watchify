@@ -2,6 +2,7 @@ var through = require('through2');
 var path = require('path');
 var chokidar = require('chokidar');
 var xtend = require('xtend');
+var anymatch = require('anymatch');
 
 module.exports = watchify;
 module.exports.args = {
@@ -15,7 +16,7 @@ function watchify (b, opts) {
     var delay = typeof opts.delay === 'number' ? opts.delay : 600;
     var changingDeps = {};
     var pending = false;
-    
+
     var wopts = {persistent: true};
     if (opts.ignoreWatch) {
         wopts.ignored = opts.ignoreWatch !== true
@@ -33,7 +34,7 @@ function watchify (b, opts) {
         b.on('reset', collect);
         collect();
     }
-    
+
     function collect () {
         b.pipeline.get('deps').push(through.obj(function(row, enc, next) {
             var file = row.expose ? b._expose[row.id] : row.file;
@@ -45,27 +46,27 @@ function watchify (b, opts) {
             next();
         }));
     }
-    
+
     b.on('file', function (file) {
         watchFile(file);
     });
-    
+
     b.on('package', function (pkg) {
         var file = path.join(pkg.__dirname, 'package.json');
         watchFile(file);
         if (pkgcache) pkgcache[file] = pkg;
     });
-    
+
     b.on('reset', reset);
     reset();
-    
+
     function reset () {
         var time = null;
         var bytes = 0;
         b.pipeline.get('record').on('end', function () {
             time = Date.now();
         });
-        
+
         b.pipeline.get('wrap').push(through(write, end));
         function write (buf, enc, next) {
             bytes += buf.length;
@@ -82,10 +83,10 @@ function watchify (b, opts) {
             this.push(null);
         }
     }
-    
+
     var fwatchers = {};
     var fwatcherFiles = {};
-    
+
     b.on('transform', function (tr, mfile) {
         tr.on('file', function (dep) {
             watchFile(mfile, dep);
@@ -94,20 +95,24 @@ function watchify (b, opts) {
 
     function watchFile (file, dep) {
         dep = dep || file;
-        if (!fwatchers[file]) fwatchers[file] = [];
-        if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
-        if (fwatcherFiles[file].indexOf(dep) >= 0) return;
+        // if we're not supposed to ignore anything, or if the file doesn't match the ignore
+        // glob, then add a watcher for it
+        if (!wopts.ignored || !anymatch([wopts.ignored], file)) {
+          if (!fwatchers[file]) fwatchers[file] = [];
+          if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
+          if (fwatcherFiles[file].indexOf(dep) >= 0) return;
 
-        var w = b._watcher(dep, wopts);
-        w.setMaxListeners(0);
-        w.on('error', b.emit.bind(b, 'error'));
-        w.on('change', function () {
-            invalidate(file);
-        });
-        fwatchers[file].push(w);
-        fwatcherFiles[file].push(dep);
+          var w = b._watcher(dep, wopts);
+          w.setMaxListeners(0);
+          w.on('error', b.emit.bind(b, 'error'));
+          w.on('change', function () {
+              invalidate(file);
+          });
+          fwatchers[file].push(w);
+          fwatcherFiles[file].push(dep);
+        }
     }
-    
+
     function invalidate (id) {
         if (cache) delete cache[id];
         if (pkgcache) delete pkgcache[id];
@@ -119,7 +124,7 @@ function watchify (b, opts) {
             delete fwatcherFiles[id];
         }
         changingDeps[id] = true
-        
+
         // wait for the disk/editor to quiet down first:
         if (!pending) setTimeout(function () {
             pending = false;
@@ -128,13 +133,13 @@ function watchify (b, opts) {
         }, delay);
         pending = true;
     }
-    
+
     b.close = function () {
         Object.keys(fwatchers).forEach(function (id) {
             fwatchers[id].forEach(function (w) { w.close() });
         });
     };
-    
+
     b._watcher = function (file, opts) {
         return chokidar.watch(file, opts);
     };

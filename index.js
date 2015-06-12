@@ -97,7 +97,7 @@ function watchify (b, opts) {
         dep = dep || file;
         // if we're not supposed to ignore anything, or if the file doesn't match the ignore
         // glob, then add a watcher for it
-        if (!wopts.ignored || !anymatch([wopts.ignored], file)) {
+        if (!wopts.ignored || !anymatch([wopts.ignored], dep)) {
           if (!fwatchers[file]) fwatchers[file] = [];
           if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
           if (fwatcherFiles[file].indexOf(dep) >= 0) return;

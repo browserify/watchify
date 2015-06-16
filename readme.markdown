@@ -110,7 +110,7 @@ var b = browserify(watchify.args);
 var w = watchify(b);
 ```
 
-**By default, watchify doesn't display any output, see events for more info.**
+**By default, watchify doesn't display any output, see [events](https://github.com/substack/watchify#events) for more info.**
 
 `w` is exactly like a browserify bundle except that caches file contents and
 emits an `'update'` event when a file changes. You should call `w.bundle()`

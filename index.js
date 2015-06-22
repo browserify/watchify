@@ -2,6 +2,7 @@ var through = require('through2');
 var path = require('path');
 var chokidar = require('chokidar');
 var xtend = require('xtend');
+var anymatch = require('anymatch');
 
 module.exports = watchify;
 module.exports.args = {
@@ -85,6 +86,7 @@ function watchify (b, opts) {
     
     var fwatchers = {};
     var fwatcherFiles = {};
+    var ignoredFiles = {};
     
     b.on('transform', function (tr, mfile) {
         tr.on('file', function (dep) {
@@ -94,6 +96,11 @@ function watchify (b, opts) {
 
     function watchFile (file, dep) {
         dep = dep || file;
+        // don't watch files which are explicitly ignored
+        if (wopts.ignored && (ignoredFiles[file] || anymatch([wopts.ignored], dep))) {
+          ignoredFiles[file] = true;
+          return;
+        }
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
         if (fwatcherFiles[file].indexOf(dep) >= 0) return;

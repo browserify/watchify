@@ -6,7 +6,6 @@ var vm = require('vm');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
-var split = require('split');
 
 var os = require('os');
 var tmpdir = path.join((os.tmpdir || os.tmpDir)(), 'watchify-' + Math.random());

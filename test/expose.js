@@ -8,7 +8,8 @@ var path = require('path');
 var mkdirp = require('mkdirp');
 
 var os = require('os');
-var tmpdir = path.join((os.tmpdir || os.tmpDir)(), 'watchify-' + Math.random());
+var tmpbase = fs.realpathSync((os.tmpdir || os.tmpDir)());
+var tmpdir = path.join(tmpbase, 'watchify-' + Math.random());
 
 var files = {
     main: path.join(tmpdir, 'main.js'),

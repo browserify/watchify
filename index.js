@@ -95,6 +95,7 @@ function watchify (b, opts) {
         });
     });
     b.on('bundle', function (bundle) {
+        updating = true;
         bundle.on('error', onend);
         bundle.on('end', onend);
         function onend () { updating = false }
@@ -141,7 +142,6 @@ function watchify (b, opts) {
             pending = false;
             if (!updating) {
                 b.emit('update', Object.keys(changingDeps));
-                updating = true;
                 changingDeps = {};
             }
         }, delay);

@@ -16,6 +16,7 @@ function watchify (b, opts) {
     var delay = typeof opts.delay === 'number' ? opts.delay : 600;
     var changingDeps = {};
     var pending = false;
+    var updating = false;
     
     var wopts = {persistent: true};
     if (opts.ignoreWatch) {
@@ -93,6 +94,11 @@ function watchify (b, opts) {
             watchFile(mfile, dep);
         });
     });
+    b.on('bundle', function (bundle) {
+        bundle.on('error', onend);
+        bundle.on('end', onend);
+        function onend () { updating = false }
+    });
 
     function watchFile (file, dep) {
         dep = dep || file;
@@ -119,6 +125,9 @@ function watchify (b, opts) {
     function invalidate (id) {
         if (cache) delete cache[id];
         if (pkgcache) delete pkgcache[id];
+        changingDeps[id] = true;
+        if (updating) return;
+        
         if (fwatchers[id]) {
             fwatchers[id].forEach(function (w) {
                 w.close();
@@ -126,13 +135,15 @@ function watchify (b, opts) {
             delete fwatchers[id];
             delete fwatcherFiles[id];
         }
-        changingDeps[id] = true;
         
         // wait for the disk/editor to quiet down first:
         if (!pending) setTimeout(function () {
             pending = false;
-            b.emit('update', Object.keys(changingDeps));
-            changingDeps = {};
+            if (!updating) {
+                b.emit('update', Object.keys(changingDeps));
+                updating = true;
+                changingDeps = {};
+            }
         }, delay);
         pending = true;
     }

@@ -97,10 +97,10 @@ function watchify (b, opts) {
     function watchFile (file, dep) {
         dep = dep || file;
         if (ignored) {
-          if (!ignoredFiles.hasOwnProperty(file)) {
-            ignoredFiles[file] = anymatch(ignored, file);
-          }
-          if (ignoredFiles[file]) return;
+            if (!ignoredFiles.hasOwnProperty(file)) {
+                ignoredFiles[file] = anymatch(ignored, file);
+            }
+            if (ignoredFiles[file]) return;
         }
         if (!fwatchers[file]) fwatchers[file] = [];
         if (!fwatcherFiles[file]) fwatcherFiles[file] = [];
@@ -126,7 +126,7 @@ function watchify (b, opts) {
             delete fwatchers[id];
             delete fwatcherFiles[id];
         }
-        changingDeps[id] = true
+        changingDeps[id] = true;
         
         // wait for the disk/editor to quiet down first:
         if (!pending) setTimeout(function () {

@@ -96,6 +96,11 @@ function watchify (b, opts) {
     });
     b.on('bundle', function (bundle) {
         updating = true;
+        // somehow if we don't listen to `data` event
+        // `end` event is never triggered
+        // not sure why this is hapening,
+        // it should be a temp fix
+        bundle.on('data', function() {});
         bundle.on('error', onend);
         bundle.on('end', onend);
         function onend () { updating = false }

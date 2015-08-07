@@ -117,6 +117,18 @@ emits an `'update'` event when a file changes. You should call `w.bundle()`
 after the `'update'` event fires to generate a new bundle. Calling `w.bundle()`
 extra times past the first time will be much faster due to caching.
 
+**Important:** Watchify will not emit `'update'` events until you've called `w.bundle()` once and completely drained the stream it returns. This can be achieved by writing the result to a file. If you aren't writing to a file before the `'update'` event fires, you will need:
+
+``` js
+var b = browserify(watchify.args);
+var w = watchify(b);
+
+// Without the line, update events won't be fired
+w.bundle().on('data', function() {});
+```
+
+Once the `'end'` event fires on the stream returned by this `w.bundle()`, `'update'` events will start to arrive as changes occur on the filesystem.
+
 `opts.delay` is the amount of time in milliseconds to wait before emitting
 an "update" event after a change. Defaults to `600`.
 

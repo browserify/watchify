@@ -138,14 +138,14 @@ function watchify (b, opts) {
         }
         
         // wait for the disk/editor to quiet down first:
-        if (!pending) setTimeout(function () {
+        if (pending) clearTimeout(pending);
+        pending = setTimeout(function () {
             pending = false;
             if (!updating) {
                 b.emit('update', Object.keys(changingDeps));
                 changingDeps = {};
             }
         }, delay);
-        pending = true;
     }
     
     b.close = function () {

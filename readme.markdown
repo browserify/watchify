@@ -173,7 +173,7 @@ bundle in milliseconds.
 
 ## w.on('log', function (msg) {})
 
-This event fires to with messages of the form:
+This event fires after a bundle was created with messages of the form:
 
 ```
 X bytes written (Y seconds)

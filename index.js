@@ -13,7 +13,7 @@ function watchify (b, opts) {
     if (!opts) opts = {};
     var cache = b._options.cache;
     var pkgcache = b._options.packageCache;
-    var delay = typeof opts.delay === 'number' ? opts.delay : 600;
+    var delay = typeof opts.delay === 'number' ? opts.delay : 100;
     var changingDeps = {};
     var pending = false;
     var updating = false;
@@ -127,9 +127,8 @@ function watchify (b, opts) {
         if (cache) delete cache[id];
         if (pkgcache) delete pkgcache[id];
         changingDeps[id] = true;
-        if (updating) return;
         
-        if (fwatchers[id]) {
+        if (!updating && fwatchers[id]) {
             fwatchers[id].forEach(function (w) {
                 w.close();
             });
@@ -138,14 +137,18 @@ function watchify (b, opts) {
         }
         
         // wait for the disk/editor to quiet down first:
-        if (!pending) setTimeout(function () {
+        if (pending) clearTimeout(pending);
+        pending = setTimeout(notify, delay);
+    }
+    
+    function notify () {
+        if (updating) {
+            pending = setTimeout(notify, delay);
+        } else {
             pending = false;
-            if (!updating) {
-                b.emit('update', Object.keys(changingDeps));
-                changingDeps = {};
-            }
-        }, delay);
-        pending = true;
+            b.emit('update', Object.keys(changingDeps));
+            changingDeps = {};
+        }
     }
     
     b.close = function () {

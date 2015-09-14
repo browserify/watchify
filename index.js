@@ -96,9 +96,12 @@ function watchify (b, opts) {
     });
     b.on('bundle', function (bundle) {
         updating = true;
-        bundle.on('error', onend);
+        bundle.on('error', function(err) {
+            b.emit('error', err);
+            onend();
+        });
         bundle.on('end', onend);
-        function onend () { updating = false }
+        function onend () { updating = false; }
     });
 
     function watchFile (file, dep) {

@@ -124,7 +124,7 @@ the `'update'` event fires, you will need:
 
 ``` js
 var b = browserify(watchify.args);
-var w = watchify(b);
+var w = watchify(b, opts);
 
 // Without the line, update events won't be fired
 w.bundle().on('data', function() {});
@@ -132,6 +132,9 @@ w.bundle().on('data', function() {});
 
 Once the `'end'` event fires on the stream returned by this `w.bundle()`,
 `'update'` events will start to arrive as changes occur on the filesystem.
+
+You can to pass an additional options object as a second parameter of
+watchify. Its properties are:
 
 `opts.delay` is the amount of time in milliseconds to wait before emitting
 an "update" event after a change. Defaults to `600`.

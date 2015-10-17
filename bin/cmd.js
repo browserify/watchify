@@ -9,6 +9,7 @@ var w = fromArgs(process.argv.slice(2));
 
 var outfile = w.argv.o || w.argv.outfile;
 var verbose = w.argv.v || w.argv.verbose;
+var timestamp = w.argv.s || w.argv.timestamp;
 
 if (w.argv.version) {
     console.error('watchify v' + require('../package.json').version +
@@ -51,7 +52,7 @@ function bundle () {
     });
     outStream.on('close', function () {
         if (verbose && !didError) {
-            console.error(bytes + ' bytes written to ' + outfile
+            console.error((timestamp ? ('[' + new Date().toString() + '] ') : (null)) + bytes + ' bytes written to ' + outfile
                 + ' (' + (time / 1000).toFixed(2) + ' seconds)'
             );
         }

@@ -13,8 +13,8 @@ spot.
 $ watchify main.js -o static/bundle.js
 ```
 
-Now as you update files, `static/bundle.js` will be automatically incrementally rebuilt on
-the fly.
+Now as you update files, `static/bundle.js` will be automatically
+incrementally rebuilt on the fly.
 
 The `-o` option can be a file or a shell command (not available on Windows)
 that receives piped input:
@@ -87,57 +87,65 @@ Advanced Options:
 
 ``` js
 var watchify = require('watchify');
-var fromArgs = require('watchify/bin/args');
 ```
 
-## var w = watchify(b, opts)
+## watchify(b, opts)
 
-Wrap a browserify bundle `b` with watchify, returning the wrapped bundle
-instance as `w`.
-
-When creating the browserify instance `b` you MUST set these properties in the
-constructor:
+watchify is a browserify [plugin](https://github.com/substack/node-browserify#bpluginplugin-opts), so it can be applied like any other plugin.
+However, when creating the browserify instance `b`, **you MUST set the `cache`
+and `packageCache` properties**:
 
 ``` js
 var b = browserify({ cache: {}, packageCache: {} });
-var w = watchify(b);
+b.plugin(watchify);
 ```
 
-You can also just do:
-
-``` js
-var b = browserify(watchify.args);
-var w = watchify(b);
+```js
+var b = browserify({
+  cache: {},
+  packageCache: {},
+  plugin: [watchify]
+});
 ```
 
 **By default, watchify doesn't display any output, see [events](https://github.com/substack/watchify#events) for more info.**
 
-`w` is exactly like a browserify bundle except that caches file contents and
-emits an `'update'` event when a file changes. You should call `w.bundle()`
-after the `'update'` event fires to generate a new bundle. Calling `w.bundle()`
-extra times past the first time will be much faster due to caching.
+`b` continues to behave like a browserify instance except that it caches file
+contents and emits an `'update'` event when a file changes. You should call
+`b.bundle()` after the `'update'` event fires to generate a new bundle.
+Calling `b.bundle()` extra times past the first time will be much faster due
+to caching.
 
 **Important:** Watchify will not emit `'update'` events until you've called
-`w.bundle()` once and completely drained the stream it returns. This can be
-achieved by writing the result to a file. If you aren't writing to a file before
-the `'update'` event fires, you will need:
+`w.bundle()` once and completely drained the stream it returns.
 
-``` js
-var b = browserify(watchify.args);
-var w = watchify(b, opts);
+```js
+var fs = require('fs');
+var browserify = require('browserify');
+var watchify = require('watchify');
 
-// Without the line, update events won't be fired
-w.bundle().on('data', function() {});
+var b = browserify({
+  entries: ['path/to/entry.js'],
+  cache: {},
+  packageCache: {},
+  plugin: [watchify]
+});
+
+b.on('update', bundle);
+bundle();
+
+function bundle() {
+  b.bundle().pipe(fs.createWriteStream('output.js'));
+}
 ```
 
-Once the `'end'` event fires on the stream returned by this `w.bundle()`,
-`'update'` events will start to arrive as changes occur on the filesystem.
+### options
 
 You can to pass an additional options object as a second parameter of
 watchify. Its properties are:
 
 `opts.delay` is the amount of time in milliseconds to wait before emitting
-an "update" event after a change. Defaults to `600`.
+an "update" event after a change. Defaults to `100`.
 
 `opts.ignoreWatch` ignores monitoring files for changes. If set to `true`,
 then `**/node_modules/**` will be ignored. For other possible values see
@@ -148,33 +156,38 @@ a polling interval of 100ms is used. If set to a number, then that amount of
 milliseconds will be the polling interval. For more info see Chokidar's
 [documentation](https://github.com/paulmillr/chokidar#performance) on
 "usePolling" and "interval".
-_This option is useful if you're watching an NFS volume._
+**This option is useful if you're watching an NFS volume.**
 
-## w.close()
+```js
+var b = browserify({ cache: {}, packageCache: {} });
+// watchify defaults:
+b.plugin(bundle, {
+  delay: 100,
+  ignoreWatch: ['**/node_modules/**'],
+  poll: false
+});
+```
+
+## b.close()
 
 Close all the open watch handles.
 
-## var w = fromArgs(args)
-
-Create a watchify instance `w` from an array of arguments `args`. The required
-constructor parameters will be set up automatically.
-
 # events
 
-## w.on('update', function (ids) {})
+## b.on('update', function (ids) {})
 
 When the bundle changes, emit the array of bundle `ids` that changed.
 
-## w.on('bytes', function (bytes) {})
+## b.on('bytes', function (bytes) {})
 
 When a bundle is generated, this event fires with the number of bytes.
 
-## w.on('time', function (time) {})
+## b.on('time', function (time) {})
 
 When a bundle is generated, this event fires with the time it took to create the
 bundle in milliseconds.
 
-## w.on('log', function (msg) {})
+## b.on('log', function (msg) {})
 
 This event fires after a bundle was created with messages of the form:
 
@@ -205,9 +218,9 @@ to get just the library.
 ## rebuilds on OS X never trigger
 
 It may be related to a bug in `fsevents` (see [#250](https://github.com/substack/watchify/issues/205#issuecomment-98672850)
-and [SO](http://stackoverflow.com/questions/26708205/webpack-watch-isnt-compiling-changed-files/28610124#28610124)).
-Try the `--poll` flag and/or renaming the project's directory - that might
-help.
+and [stackoverflow](http://stackoverflow.com/questions/26708205/webpack-watch-isnt-compiling-changed-files/28610124#28610124)).
+Try the `--poll` flag
+and/or renaming the project's directory - that might help.
 
 # license
 

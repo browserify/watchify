@@ -2,6 +2,7 @@
 
 var path = require('path');
 var outpipe = require('outpipe');
+var through = require('through2');
 
 var fromArgs = require('./args.js');
 var w = fromArgs(process.argv.slice(2));
@@ -33,24 +34,31 @@ bundle();
 
 function bundle () {
     var didError = false;
-    var outStream = outpipe(outfile);
-
+    var writer = through();
     var wb = w.bundle();
+    
+    w.pipeline.get('pack').once('readable', function() {
+        wb.pipe(writer);
+    });
+    
     wb.on('error', function (err) {
         console.error(String(err));
         didError = true;
-        outStream.end('console.error('+JSON.stringify(String(err))+');');
+        writer.end('console.error(' + JSON.stringify(String(err)) + ');');
     });
-    wb.pipe(outStream);
-
-    outStream.on('error', function (err) {
-        console.error(err);
-    });
-    outStream.on('exit', function () {
-        if (verbose && !didError) {
-            console.error(bytes + ' bytes written to ' + outfile
-                + ' (' + (time / 1000).toFixed(2) + ' seconds)'
-            );
-        }
+    
+    writer.once('readable', function() {
+        var outStream = outpipe(outfile);
+        outStream.on('error', function (err) {
+            console.error(err);
+        });
+        outStream.on('exit', function () {
+            if (verbose && !didError) {
+                console.error(bytes + ' bytes written to ' + outfile
+                    + ' (' + (time / 1000).toFixed(2) + ' seconds)'
+                );
+            }
+        });
+        writer.pipe(outStream);
     });
 }

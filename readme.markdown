@@ -51,8 +51,7 @@ Standard Options:
 
     This option is required. Write the browserify bundle to this file. If
     the file contains the operators `|` or `>`, it will be treated as a
-    shell command, and the output will be piped to it (not available on
-    Windows).
+    shell command, and the output will be piped to it.
 
   --verbose, -v                     [default: false]
 

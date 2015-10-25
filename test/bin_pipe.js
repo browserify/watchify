@@ -15,18 +15,13 @@ var files = {
 };
 
 mkdirp.sync(tmpdir);
-fs.writeFileSync(files.main, 'console.log(9+9+555)');
+fs.writeFileSync(files.main, 'console.log(num * 2)');
 
 test('bin with pipe', function (t) {
-    if (process.platform === 'win32') {
-        t.skip('not for windows');
-        t.end();
-        return;
-    }
     t.plan(4);
     var ps = spawn(cmd, [
         files.main,
-        '-o', 'sed "s/9+9+//" > ' + files.bundle,
+        '-o', 'uglifyjs - --enclose 11:num > ' + files.bundle,
         '-v'
     ]);
     var lineNum = 0;
@@ -35,14 +30,14 @@ test('bin with pipe', function (t) {
         if (lineNum === 1) {
             run(files.bundle, function (err, output) {
                 t.ifError(err);
-                t.equal(output, '555\n');
-                fs.writeFile(files.main, 'console.log(9+9+333)');
+                t.equal(output, '22\n');
+                fs.writeFile(files.main, 'console.log(num * 3)');
             });
         }
         else if (lineNum === 2) {
             run(files.bundle, function (err, output) {
                 t.ifError(err);
-                t.equal(output, '333\n');
+                t.equal(output, '33\n');
                 ps.kill();
             });
         }

@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 
-var fs = require('fs');
 var path = require('path');
 var outpipe = require('outpipe');
 
@@ -34,9 +33,7 @@ bundle();
 
 function bundle () {
     var didError = false;
-    var outStream = process.platform === 'win32'
-        ? fs.createWriteStream(outfile)
-        : outpipe(outfile);
+    var outStream = outpipe(outfile);
 
     var wb = w.bundle();
     wb.on('error', function (err) {
@@ -49,7 +46,7 @@ function bundle () {
     outStream.on('error', function (err) {
         console.error(err);
     });
-    outStream.on('close', function () {
+    outStream.on('exit', function () {
         if (verbose && !didError) {
             console.error(bytes + ' bytes written to ' + outfile
                 + ' (' + (time / 1000).toFixed(2) + ' seconds)'

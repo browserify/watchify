@@ -41,7 +41,7 @@ function watchify (b, opts) {
             var file = row.expose ? b._expose[row.id] : row.file;
             cache[file] = {
                 source: row.source,
-                deps: xtend({}, row.deps)
+                deps: xtend(row.deps)
             };
             this.push(row);
             next();

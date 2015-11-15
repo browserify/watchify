@@ -38,13 +38,17 @@ function bundle () {
     var wb = w.bundle();
     
     w.pipeline.get('pack').once('readable', function() {
-        wb.pipe(writer);
+        if (!didError) {
+            wb.pipe(writer);
+        }
     });
     
     wb.on('error', function (err) {
         console.error(String(err));
-        didError = true;
-        writer.end('console.error(' + JSON.stringify(String(err)) + ');');
+        if (!didError) {
+            didError = true;
+            writer.end('console.error(' + JSON.stringify(String(err)) + ');');
+        }
     });
     
     writer.once('readable', function() {

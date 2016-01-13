@@ -224,6 +224,7 @@ and/or renaming the project's directory - that might help.
 # see also
 
 - [budo](https://www.npmjs.com/package/budo) – a simple development server built on watchify
+- [errorify](https://www.npmjs.com/package/errorify) – a plugin to add error handling to watchify development
 - [watchify-request](https://www.npmjs.com/package/watchify-request) – wraps a `watchify` instance to avoid stale bundles in HTTP requests
 - [watchify-middleware](https://www.npmjs.com/package/watchify-middleware) – similar to `watchify-request`, but includes some higher-level features
 

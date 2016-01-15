@@ -171,9 +171,6 @@ function watchify (b, opts) {
             if (entriesRemoved[file]) {
                 delete entriesRemoved[file];
             }
-            watchFile(file);
-
-            // kick for `update`
             invalidate(file);
         });
         watcher.on('unlink', function (file) {
@@ -182,8 +179,6 @@ function watchify (b, opts) {
             if (entriesAdded[file]) {
                 delete entriesAdded[file];
             }
-
-            // kick for `update`
             invalidate(file);
         });
 

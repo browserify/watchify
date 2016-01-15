@@ -11,6 +11,7 @@ module.exports = function (args) {
     if (ignoreWatch) {
         opts.ignoreWatch = ignoreWatch;
     }
+    opts.entryGlob = b.argv['entry-glob'];
 
     return watchify(b, xtend(opts, b.argv));
 };

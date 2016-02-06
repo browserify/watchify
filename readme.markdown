@@ -66,7 +66,7 @@ Standard Options:
 ```
 Advanced Options:
 
-  --delay                           [default: 600]
+  --delay                           [default: 100]
 
     Amount of time in milliseconds to wait before emitting an "update"
     event after a change.

@@ -1,4 +1,6 @@
 # watchify
+[![version](https://img.shields.io/npm/v/watchify2.svg)](https://www.npmjs.org/package/watchify2)
+[![status](https://travis-ci.org/reducejs/watchify2.svg?branch=master)](https://travis-ci.org/reducejs/watchify2)
 
 This is a clone for [watchify]
 to support detecting new entries.

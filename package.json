@@ -1,6 +1,6 @@
 {
-  "name": "watchify",
-  "version": "3.7.0",
+  "name": "watchify2",
+  "version": "0.0.0",
   "description": "watch mode for browserify builds",
   "main": "index.js",
   "bin": "bin/cmd.js",
@@ -26,9 +26,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/substack/watchify.git"
+    "url": "git://github.com/reducejs/watchify2.git"
   },
-  "homepage": "https://github.com/substack/watchify",
+  "homepage": "https://github.com/reducejs/watchify2",
   "keywords": [
     "browserify",
     "browserify-tool",
@@ -37,10 +37,5 @@
     "build",
     "browser"
   ],
-  "author": {
-    "name": "James Halliday",
-    "email": "mail@substack.net",
-    "url": "http://substack.net"
-  },
   "license": "MIT"
 }

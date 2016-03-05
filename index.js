@@ -161,5 +161,9 @@ function watchify (b, opts) {
         return chokidar.watch(file, opts);
     };
 
+    for (file in cache) {
+        watchFile(file);
+    };
+
     return b;
 }

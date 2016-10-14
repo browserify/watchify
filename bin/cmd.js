@@ -59,7 +59,8 @@ function bundle () {
         outStream.on('exit', function () {
             if (verbose && !didError) {
                 console.error(bytes + ' bytes written to ' + outfile
-                    + ' (' + (time / 1000).toFixed(2) + ' seconds)'
+                    + ' (' + (time / 1000).toFixed(2) + ' seconds) at '
+                    + new Date().toLocaleTimeString()
                 );
             }
         });

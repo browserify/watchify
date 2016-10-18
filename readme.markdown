@@ -116,7 +116,7 @@ Calling `b.bundle()` extra times past the first time will be much faster due
 to caching.
 
 **Important:** Watchify will not emit `'update'` events until you've called
-`w.bundle()` once and completely drained the stream it returns.
+`b.bundle()` once and completely drained the stream it returns.
 
 ```js
 var fs = require('fs');

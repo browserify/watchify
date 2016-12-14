@@ -31,12 +31,12 @@ You can use `-v` to get more verbose output to show when a file was written and 
 
 ```
 $ watchify browser.js -d -o static/bundle.js -v
-610598 bytes written to static/bundle.js (0.23 seconds)
-610606 bytes written to static/bundle.js (0.10 seconds)
-610597 bytes written to static/bundle.js (0.14 seconds)
-610606 bytes written to static/bundle.js (0.08 seconds)
-610597 bytes written to static/bundle.js (0.08 seconds)
-610597 bytes written to static/bundle.js (0.19 seconds)
+610598 bytes written to static/bundle.js (0.23 seconds) at 8:31:25 PM
+610606 bytes written to static/bundle.js (0.10 seconds) at 8:45:59 PM
+610597 bytes written to static/bundle.js (0.14 seconds) at 8:46:02 PM
+610606 bytes written to static/bundle.js (0.08 seconds) at 8:50:13 PM
+610597 bytes written to static/bundle.js (0.08 seconds) at 8:58:16 PM
+610597 bytes written to static/bundle.js (0.19 seconds) at 9:10:45 PM
 ```
 
 # usage

@@ -17,6 +17,7 @@ function watchify (b, opts) {
     var changingDeps = {};
     var pending = false;
     var updating = false;
+    var transformCache = b._options.transformCache
     
     var wopts = {persistent: true};
     if (opts.ignoreWatch) {
@@ -90,7 +91,13 @@ function watchify (b, opts) {
     var ignoredFiles = {};
     
     b.on('transform', function (tr, mfile) {
+        if (transformCache && !transformCache[mfile]) {
+            transformCache[mfile] = [];
+        }
         tr.on('file', function (dep) {
+            if (transformCache) {
+                transformCache[mfile].push(dep);
+            }
             watchFile(mfile, dep);
         });
     });
@@ -159,6 +166,15 @@ function watchify (b, opts) {
     
     b._watcher = function (file, opts) {
         return chokidar.watch(file, opts);
+    };
+
+    for (file in cache) {
+        watchFile(file);
+        if (transformCache) {
+            for(dep in transformCache[file]) {
+                watchFile(file, transformCache[file][dep]);
+            };
+        }
     };
 
     return b;

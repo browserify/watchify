@@ -9,6 +9,13 @@ var w = fromArgs(process.argv.slice(2));
 
 var outfile = w.argv.o || w.argv.outfile;
 var verbose = w.argv.v || w.argv.verbose;
+var version = w.argv.V || w.argv.version;
+
+if (version) {
+  var pkg = require('../package.json');
+  console.log(pkg.version);
+  process.exit(0);
+}
 
 if (w.argv.version) {
     console.error('watchify v' + require('../package.json').version +

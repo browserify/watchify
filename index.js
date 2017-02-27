@@ -158,6 +158,7 @@ function watchify (b, opts) {
     };
     
     b._watcher = function (file, opts) {
+        file = file.replace(/\s|\(|\)/g, (e) => { return `\\${e}` });
         return chokidar.watch(file, opts);
     };
 

@@ -16,13 +16,18 @@ mkdirp.sync(tmpdir);
 fs.writeFileSync(file, 'console.log(555)');
 
 test('errors', function (t) {
-    t.plan(5);
+    t.plan(6);
+
     var w = watchify(browserify(file, watchify.args));
     w.bundle(function (err, src) {
         t.ifError(err);
         t.equal(run(src), '555\n');
         breakTheBuild();
     });
+    w.on('error', function(err) {
+        t.ok(err instanceof Error, 'should be error');        
+    });
+
     function breakTheBuild() {
         setTimeout(function() {
             fs.writeFileSync(file, 'console.log(');
@@ -42,6 +47,7 @@ test('errors', function (t) {
             w.bundle(function (err, src) {
                 t.ifError(err);
                 t.equal(run(src), '333\n');
+                t.end();
                 w.close();
             });
         });

@@ -107,6 +107,23 @@ var b = browserify({
 });
 ```
 
+A full working example:
+
+```js
+var browserify = require("browserify");
+var watchify = require("watchify");
+var fs = require("fs");
+
+var b = browserify({ cache: {}, packageCache: {} });
+var w = watchify(b);
+
+w.add('index.js');
+
+w.on('update', function () {
+  w.bundle().pipe(fs.createWriteStream('output.js'));
+});
+```
+
 **By default, watchify doesn't display any output, see [events](https://github.com/substack/watchify#events) for more info.**
 
 `b` continues to behave like a browserify instance except that it caches file

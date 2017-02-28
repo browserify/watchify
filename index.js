@@ -117,6 +117,7 @@ function watchify (b, opts) {
         w.setMaxListeners(0);
         w.on('error', b.emit.bind(b, 'error'));
         w.on('change', function () {
+            if (b._mdeps.top.basedir === file) return;  
             invalidate(file);
         });
         fwatchers[file].push(w);

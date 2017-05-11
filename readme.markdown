@@ -7,9 +7,10 @@ watch mode for [browserify](https://github.com/substack/node-browserify) builds
 Update any source file and your browserify bundle will be recompiled on the
 spot.
 
-# example
 
-```
+## Examples
+
+```shell
 $ watchify main.js -o static/bundle.js
 ```
 
@@ -19,18 +20,18 @@ incrementally rebuilt on the fly.
 The `-o` option can be a file or a shell command (not available on Windows)
 that receives piped input:
 
-``` sh
-watchify main.js -o 'exorcist static/bundle.js.map > static/bundle.js' -d
+```shell
+watchify main.js -o 'exorcist static/bundle.js.map > static/bundle.js'
 ```
 
-``` sh
+```shell
 watchify main.js -o 'uglifyjs -cm > static/bundle.min.js'
 ```
 
 You can use `-v` to get more verbose output to show when a file was written and how long the bundling took (in seconds):
 
-```
-$ watchify browser.js -d -o static/bundle.js -v
+```shell
+$ watchify browser.js -v -o static/bundle.js
 610598 bytes written to static/bundle.js (0.23 seconds) at 8:31:25 PM
 610606 bytes written to static/bundle.js (0.10 seconds) at 8:45:59 PM
 610597 bytes written to static/bundle.js (0.14 seconds) at 8:46:02 PM
@@ -39,7 +40,14 @@ $ watchify browser.js -d -o static/bundle.js -v
 610597 bytes written to static/bundle.js (0.19 seconds) at 9:10:45 PM
 ```
 
-# usage
+And you still can use any browserify option because all the browserify options are valid in watchify:
+
+```shell
+$ watchify browser.js -o static/bundle.js -d
+```
+
+
+## Usage
 
 Use `watchify` with all the same options as `browserify` except that `-o` (or
 `--outfile`) is mandatory. Additionally, there are also:
@@ -82,19 +90,20 @@ Advanced Options:
     to 100ms. This option is useful if you're watching an NFS volume.
 ```
 
-# methods
 
-``` js
+## Methods
+
+```js
 var watchify = require('watchify');
 ```
 
-## watchify(b, opts)
+### watchify(b, options)
 
 watchify is a browserify [plugin](https://github.com/substack/node-browserify#bpluginplugin-opts), so it can be applied like any other plugin.
 However, when creating the browserify instance `b`, **you MUST set the `cache`
 and `packageCache` properties**:
 
-``` js
+```js
 var b = browserify({ cache: {}, packageCache: {} });
 b.plugin(watchify);
 ```
@@ -138,19 +147,19 @@ function bundle() {
 }
 ```
 
-### options
+#### Options
 
 You can to pass an additional options object as a second parameter of
 watchify. Its properties are:
 
-`opts.delay` is the amount of time in milliseconds to wait before emitting
+`options.delay` is the amount of time in milliseconds to wait before emitting
 an "update" event after a change. Defaults to `100`.
 
-`opts.ignoreWatch` ignores monitoring files for changes. If set to `true`,
+`options.ignoreWatch` ignores monitoring files for changes. If set to `true`,
 then `**/node_modules/**` will be ignored. For other possible values see
 Chokidar's [documentation](https://github.com/paulmillr/chokidar#path-filtering) on "ignored".
 
-`opts.poll` enables polling to monitor for changes. If set to `true`, then
+`options.poll` enables polling to monitor for changes. If set to `true`, then
 a polling interval of 100ms is used. If set to a number, then that amount of
 milliseconds will be the polling interval. For more info see Chokidar's
 [documentation](https://github.com/paulmillr/chokidar#performance) on
@@ -167,26 +176,27 @@ b.plugin(bundle, {
 });
 ```
 
-## b.close()
+### b.close()
 
 Close all the open watch handles.
 
-# events
 
-## b.on('update', function (ids) {})
+## Events
+
+### b.on('update', function (ids) {})
 
 When the bundle changes, emit the array of bundle `ids` that changed.
 
-## b.on('bytes', function (bytes) {})
+### b.on('bytes', function (bytes) {})
 
 When a bundle is generated, this event fires with the number of bytes.
 
-## b.on('time', function (time) {})
+### b.on('time', function (time) {})
 
 When a bundle is generated, this event fires with the time it took to create the
 bundle in milliseconds.
 
-## b.on('log', function (msg) {})
+### b.on('log', function (msg) {})
 
 This event fires after a bundle was created with messages of the form:
 
@@ -196,38 +206,42 @@ X bytes written (Y seconds)
 
 with the number of bytes in the bundle X and the time in seconds Y.
 
-# install
+
+## Install
 
 With [npm](https://npmjs.org) do:
 
-```
+```shell
 $ npm install -g watchify
 ```
 
 to get the watchify command and:
 
-```
+```shell
 $ npm install watchify
 ```
 
 to get just the library.
 
-# troubleshooting
 
-## rebuilds on OS X never trigger
+## Troubleshooting
+
+### Rebuilds on OS X never trigger
 
 It may be related to a bug in `fsevents` (see [#250](https://github.com/substack/watchify/issues/205#issuecomment-98672850)
 and [stackoverflow](http://stackoverflow.com/questions/26708205/webpack-watch-isnt-compiling-changed-files/28610124#28610124)).
 Try the `--poll` flag
 and/or renaming the project's directory - that might help.
 
-# see also
+
+## See also
 
 - [budo](https://www.npmjs.com/package/budo) – a simple development server built on watchify
 - [errorify](https://www.npmjs.com/package/errorify) – a plugin to add error handling to watchify development
 - [watchify-request](https://www.npmjs.com/package/watchify-request) – wraps a `watchify` instance to avoid stale bundles in HTTP requests
 - [watchify-middleware](https://www.npmjs.com/package/watchify-middleware) – similar to `watchify-request`, but includes some higher-level features
 
-# license
+
+## License
 
 MIT

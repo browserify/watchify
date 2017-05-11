@@ -30,6 +30,9 @@ function watchify (b, opts) {
             ? opts.poll
             : undefined;
     }
+    if (opts.disableGlobbing) {
+        wopts.disableGlobbing = true;
+    }
 
     if (cache) {
         b.on('reset', collect);

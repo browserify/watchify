@@ -80,6 +80,11 @@ Advanced Options:
 
     Use polling to monitor for changes. Omitting the interval will default
     to 100ms. This option is useful if you're watching an NFS volume.
+
+  --disable-globbing                [default: false]
+
+    If set to `true` then entry files are treated as literal path names, 
+    even if they look like globs.
 ```
 
 # methods
@@ -166,6 +171,9 @@ b.plugin(bundle, {
   poll: false
 });
 ```
+
+`opts.disableGlobbing` treats entry files as literal path names, even if they look like globs. 
+See also Chokidar's [documentation](https://github.com/paulmillr/chokidar#path-filtering).
 
 ## b.close()
 

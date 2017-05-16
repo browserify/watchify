@@ -27,7 +27,7 @@ test('bin', function (t) {
             run(files.bundle, function (err, output) {
                 t.ifError(err);
                 t.equal(output, '555\n');
-                fs.writeFile(files.main, 'console.log(333)');
+                fs.writeFile(files.main, 'console.log(333)', function(err) {});
             })
         }
         else if (lineNum === 2) {

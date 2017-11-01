@@ -160,7 +160,7 @@ milliseconds will be the polling interval. For more info see Chokidar's
 ```js
 var b = browserify({ cache: {}, packageCache: {} });
 // watchify defaults:
-b.plugin(bundle, {
+b.plugin(watchify, {
   delay: 100,
   ignoreWatch: ['**/node_modules/**'],
   poll: false

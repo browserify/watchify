@@ -11,6 +11,10 @@ module.exports = function (args) {
     if (ignoreWatch) {
         opts.ignoreWatch = ignoreWatch;
     }
+    var disableGlobbing = defined(b.argv['disable-globbing']);
+    if (disableGlobbing) {
+        opts.disableGlobbing = true;
+    }
 
     return watchify(b, xtend(opts, b.argv));
 };

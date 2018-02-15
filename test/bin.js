@@ -18,7 +18,7 @@ mkdirp.sync(tmpdir);
 fs.writeFileSync(files.main, 'console.log(555)');
 
 test('bin', function (t) {
-    t.plan(4);
+    t.plan(5);
     var ps = spawn(cmd, [ files.main, '-o', files.bundle, '-v' ]);
     var lineNum = 0;
     ps.stderr.pipe(split()).on('data', function (line) {
@@ -27,7 +27,7 @@ test('bin', function (t) {
             run(files.bundle, function (err, output) {
                 t.ifError(err);
                 t.equal(output, '555\n');
-                fs.writeFile(files.main, 'console.log(333)');
+                fs.writeFile(files.main, 'console.log(333)', t.ifError);
             })
         }
         else if (lineNum === 2) {

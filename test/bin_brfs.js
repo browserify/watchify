@@ -24,7 +24,7 @@ fs.writeFileSync(files.main, [
 fs.writeFileSync(files.lines, 'beep\nboop');
 
 test('bin brfs', function (t) {
-    t.plan(4);
+    t.plan(5);
     var ps = spawn(cmd, [
         files.main,
         '-t', require.resolve('brfs'), '-v',
@@ -37,7 +37,7 @@ test('bin brfs', function (t) {
             run(files.bundle, function (err, output) {
                 t.ifError(err);
                 t.equal(output, 'BEEP\nBOOP\n');
-                fs.writeFile(files.lines, 'robo-bOOgie');
+                fs.writeFile(files.lines, 'robo-bOOgie', t.ifError);
             })
         }
         else if (lineNum === 2) {

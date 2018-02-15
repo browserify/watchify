@@ -18,7 +18,7 @@ mkdirp.sync(tmpdir);
 fs.writeFileSync(files.main, 'console.log(num * 2)');
 
 test('bin with pipe', function (t) {
-    t.plan(4);
+    t.plan(5);
     var ps = spawn(cmd, [
         files.main,
         '-o', 'uglifyjs - --enclose 11:num > ' + files.bundle,
@@ -31,7 +31,7 @@ test('bin with pipe', function (t) {
             run(files.bundle, function (err, output) {
                 t.ifError(err);
                 t.equal(output, '22\n');
-                fs.writeFile(files.main, 'console.log(num * 3)');
+                fs.writeFile(files.main, 'console.log(num * 3)', t.ifError);
             });
         }
         else if (lineNum === 2) {

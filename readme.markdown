@@ -196,6 +196,25 @@ X bytes written (Y seconds)
 
 with the number of bytes in the bundle X and the time in seconds Y.
 
+# working with browserify transforms
+
+If your custom transform for browserify adds new files to bundle in a non-standard way without requiring.
+You can inform Watchify about these files by emiting 'file' event.
+
+module.exports = function(file) {
+  return through(
+    function(buf, enc, next) {
+      /*
+        manipulating file content
+      */
+      
+      this.emit("file", absolutePathToFileThatHasToBeWatched);
+      
+      next();
+    }
+  );
+};
+
 # install
 
 With [npm](https://npmjs.org) do:

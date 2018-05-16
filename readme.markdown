@@ -134,7 +134,10 @@ b.on('update', bundle);
 bundle();
 
 function bundle() {
-  b.bundle().pipe(fs.createWriteStream('output.js'));
+  b.bundle()
+    .on('error', console.error)
+    .pipe(fs.createWriteStream('output.js'))
+  ;
 }
 ```
 
@@ -241,6 +244,19 @@ It may be related to a bug in `fsevents` (see [#250](https://github.com/substack
 and [stackoverflow](http://stackoverflow.com/questions/26708205/webpack-watch-isnt-compiling-changed-files/28610124#28610124)).
 Try the `--poll` flag
 and/or renaming the project's directory - that might help.
+
+## watchify swallows errors
+
+To ensure errors are reported you have to add a event listener to your bundle stream. For more information see ([browserify/browserify#1487 (comment)](https://github.com/browserify/browserify/issues/1487#issuecomment-173357516) and [stackoverflow](https://stackoverflow.com/a/22389498/1423220))
+
+**Example:**
+```
+var b = browserify();
+b.bundle()
+  .on('error', console.error)
+   ...
+;
+```
 
 # see also
 

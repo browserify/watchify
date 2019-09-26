@@ -90,7 +90,7 @@ var watchify = require('watchify');
 
 ## watchify(b, opts)
 
-watchify is a browserify [plugin](https://github.com/browserify/node-browserify#bpluginplugin-opts), so it can be applied like any other plugin.
+watchify is a browserify [plugin](https://github.com/browserify/browserify#bpluginplugin-opts), so it can be applied like any other plugin.
 However, when creating the browserify instance `b`, **you MUST set the `cache`
 and `packageCache` properties**:
 

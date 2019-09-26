@@ -90,7 +90,7 @@ var watchify = require('watchify');
 
 ## watchify(b, opts)
 
-watchify is a browserify [plugin](https://github.com/substack/node-browserify#bpluginplugin-opts), so it can be applied like any other plugin.
+watchify is a browserify [plugin](https://github.com/browserify/node-browserify#bpluginplugin-opts), so it can be applied like any other plugin.
 However, when creating the browserify instance `b`, **you MUST set the `cache`
 and `packageCache` properties**:
 
@@ -107,7 +107,7 @@ var b = browserify({
 });
 ```
 
-**By default, watchify doesn't display any output, see [events](https://github.com/substack/watchify#events) for more info.**
+**By default, watchify doesn't display any output, see [events](https://github.com/browserify/watchify#events) for more info.**
 
 `b` continues to behave like a browserify instance except that it caches file
 contents and emits an `'update'` event when a file changes. You should call
@@ -240,7 +240,7 @@ to get just the library.
 
 ## rebuilds on OS X never trigger
 
-It may be related to a bug in `fsevents` (see [#250](https://github.com/substack/watchify/issues/205#issuecomment-98672850)
+It may be related to a bug in `fsevents` (see [#250](https://github.com/browserify/watchify/issues/205#issuecomment-98672850)
 and [stackoverflow](http://stackoverflow.com/questions/26708205/webpack-watch-isnt-compiling-changed-files/28610124#28610124)).
 Try the `--poll` flag
 and/or renaming the project's directory - that might help.

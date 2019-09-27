@@ -26,9 +26,9 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/substack/watchify.git"
+    "url": "git://github.com/browserify/watchify.git"
   },
-  "homepage": "https://github.com/substack/watchify",
+  "homepage": "https://github.com/browserify/watchify",
   "keywords": [
     "browserify",
     "browserify-tool",

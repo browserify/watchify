@@ -7,7 +7,7 @@
   "dependencies": {
     "anymatch": "^2.0.0",
     "browserify": "^16.1.0",
-    "chokidar": "^2.1.1",
+    "chokidar": "^3.2.1",
     "defined": "^1.0.0",
     "outpipe": "^1.1.0",
     "through2": "^2.0.0",

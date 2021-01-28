@@ -5,9 +5,9 @@
   "main": "index.js",
   "bin": "bin/cmd.js",
   "dependencies": {
-    "anymatch": "^2.0.0",
+    "anymatch": "^3.1.0",
     "browserify": "^16.1.0",
-    "chokidar": "^2.1.1",
+    "chokidar": "^3.4.0",
     "defined": "^1.0.0",
     "outpipe": "^1.1.0",
     "through2": "^2.0.0",

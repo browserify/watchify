@@ -6,18 +6,18 @@
   "bin": "bin/cmd.js",
   "dependencies": {
     "anymatch": "^3.1.0",
-    "browserify": "^16.1.0",
+    "browserify": "^17.0.0",
     "chokidar": "^3.4.0",
     "defined": "^1.0.0",
     "outpipe": "^1.1.0",
-    "through2": "^2.0.0",
-    "xtend": "^4.0.0"
+    "through2": "^4.0.2",
+    "xtend": "^4.0.2"
   },
   "devDependencies": {
     "brfs": "^2.0.1",
-    "mkdirp": "~0.5.1",
+    "mkdirp": "^0.5.5",
     "split": "^1.0.0",
-    "tape": "^4.2.2",
+    "tape": "^5.1.1",
     "uglify-js": "^2.5.0",
     "win-spawn": "^2.0.0"
   },

@@ -1,9 +1,12 @@
 {
   "name": "watchify",
-  "version": "3.11.1",
+  "version": "4.0.0",
   "description": "watch mode for browserify builds",
   "main": "index.js",
   "bin": "bin/cmd.js",
+  "engines": {
+    "node": ">= 8.10.0"
+  },
   "dependencies": {
     "anymatch": "^3.1.0",
     "browserify": "^17.0.0",

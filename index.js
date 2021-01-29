@@ -1,6 +1,8 @@
 var through = require('through2');
 var path = require('path');
 var chokidar = require('chokidar');
+var fs = require('fs');
+var watchProvider = chokidar;
 var xtend = require('xtend');
 var anymatch = require('anymatch');
 
@@ -19,6 +21,9 @@ function watchify (b, opts) {
     var updating = false;
     
     var wopts = {persistent: true};
+	if (opts.nativeWatch) {
+		watchProvider = fs;
+	}
     if (opts.ignoreWatch) {
         var ignored = opts.ignoreWatch !== true
             ? opts.ignoreWatch
@@ -158,7 +163,7 @@ function watchify (b, opts) {
     };
     
     b._watcher = function (file, opts) {
-        return chokidar.watch(file, opts);
+        return watchProvider.watch(file, opts);
     };
 
     return b;

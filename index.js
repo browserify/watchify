@@ -89,6 +89,10 @@ function watchify (b, opts) {
     var fwatcherFiles = {};
     var ignoredFiles = {};
     
+    if (opts.entryGlob) {
+        fwatchers._entryWatcher = [watchEntries(opts.entryGlob)];
+    }
+
     b.on('transform', function (tr, mfile) {
         tr.on('file', function (dep) {
             watchFile(mfile, dep);
@@ -149,6 +153,57 @@ function watchify (b, opts) {
             b.emit('update', Object.keys(changingDeps));
             changingDeps = {};
         }
+    }
+
+    function watchEntries(glob) {
+        var entriesAdded = {};
+        var entriesRemoved = {};
+
+        var basedir = b._options.basedir || process.cwd();
+        var watchOpts = xtend({ cwd: basedir }, wopts);
+        watchOpts.ignoreInitial = true;
+        var watcher = chokidar.watch(glob, watchOpts);
+
+        watcher.on('error', b.emit.bind(b, 'error'));
+        watcher.on('add', function (file) {
+            file = path.join(basedir, file);
+            entriesAdded[file] = true;
+            if (entriesRemoved[file]) {
+                delete entriesRemoved[file];
+            }
+            invalidate(file);
+        });
+        watcher.on('unlink', function (file) {
+            file = path.join(basedir, file);
+            entriesRemoved[file] = true;
+            if (entriesAdded[file]) {
+                delete entriesAdded[file];
+            }
+            invalidate(file);
+        });
+
+        b.on('reset', function () {
+            var added = entriesAdded;
+            var removed = entriesRemoved;
+            entriesAdded = {};
+            entriesRemoved = {};
+            var entryOrder = 0;
+
+            b.pipeline.get('record').unshift(through.obj(function (row, enc, next) {
+                if (row.file && removed[row.file]) {
+                    return next();
+                }
+                if (row.entry) {
+                    // for browser-pack
+                    row.order = entryOrder++;
+                }
+                next(null, row);
+            }));
+
+            b.add(Object.keys(added), { basedir: b._options.basedir });
+        })
+
+        return watcher;
     }
     
     b.close = function () {

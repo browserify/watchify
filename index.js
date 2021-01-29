@@ -39,6 +39,7 @@ function watchify (b, opts) {
     function collect () {
         b.pipeline.get('deps').push(through.obj(function(row, enc, next) {
             var file = row.expose ? b._expose[row.id] : row.file;
+            watchFile(file);
             cache[file] = {
                 source: row.source,
                 deps: xtend(row.deps)

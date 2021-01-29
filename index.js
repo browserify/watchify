@@ -29,6 +29,8 @@ function watchify (b, opts) {
         wopts.interval = opts.poll !== true
             ? opts.poll
             : undefined;
+    } else if (opts.poll === false) {
+        wopts.usePolling = false;
     }
 
     if (cache) {

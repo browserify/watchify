@@ -1,7 +1,6 @@
 var through = require('through2');
 var path = require('path');
 var chokidar = require('chokidar');
-var xtend = require('xtend');
 var anymatch = require('anymatch');
 
 module.exports = watchify;
@@ -41,7 +40,7 @@ function watchify (b, opts) {
             var file = row.expose ? b._expose[row.id] : row.file;
             cache[file] = {
                 source: row.source,
-                deps: xtend(row.deps)
+                deps: Object.assign({}, row.deps)
             };
             this.push(row);
             next();

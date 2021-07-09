@@ -1,7 +1,6 @@
 var fromArgs = require('browserify/bin/args');
 var watchify = require('../');
 var defined = require('defined');
-var xtend = require('xtend');
 
 module.exports = function (args) {
     var b = fromArgs(args, watchify.args);
@@ -12,5 +11,5 @@ module.exports = function (args) {
         opts.ignoreWatch = ignoreWatch;
     }
 
-    return watchify(b, xtend(opts, b.argv));
+    return watchify(b, Object.assign(opts, b.argv));
 };

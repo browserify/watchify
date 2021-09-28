@@ -22,7 +22,7 @@
     "split": "^1.0.0",
     "tape": "^5.1.1",
     "uglify-js": "^2.5.0",
-    "win-spawn": "^2.0.0"
+    "cross-spawn": "^7.0.3"
   },
   "scripts": {
     "test": "tape test/*.js"

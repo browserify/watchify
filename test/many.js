@@ -2,7 +2,7 @@ var test = require('tape');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
-var spawn = require('win-spawn');
+var spawn = require('cross-spawn');
 var split = require('split');
 
 var cmd = path.resolve(__dirname, '../bin/cmd.js');
@@ -66,11 +66,11 @@ test('many edits', function (t) {
     var lineNum = 0;
     ps.stderr.pipe(split()).on('data', function (line) {
         if (line.length === 0) return;
-        
+
         run(files.bundle, function (err, output) {
             t.ifError(err);
             t.equal(output, expected.shift());
-            
+
             (function next () {
                 if (edits.length === 0) return;
                 var edit = edits.shift();
@@ -83,7 +83,7 @@ test('many edits', function (t) {
             })();
         })
     });
-    
+
     t.on('end', function () {
         ps.kill();
     });

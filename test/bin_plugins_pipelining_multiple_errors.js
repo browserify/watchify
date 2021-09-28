@@ -2,7 +2,7 @@ var test = require('tape');
 var fs = require('fs');
 var path = require('path');
 var mkdirp = require('mkdirp');
-var spawn = require('win-spawn');
+var spawn = require('cross-spawn');
 var split = require('split');
 
 var cmd = path.resolve(__dirname, '../bin/cmd.js');
